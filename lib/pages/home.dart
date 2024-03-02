@@ -2,26 +2,34 @@ import 'package:flutter/material.dart';
 import '../items/workspace_item.dart';
 
 class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Sample list of workspace items
     List<WorkspaceItem> workspaces = [
       WorkspaceItem(name: 'Workspace 1'),
       WorkspaceItem(name: 'Workspace 2'),
       WorkspaceItem(name: 'Workspace 3'),
       WorkspaceItem(name: 'Workspace 4'),
       WorkspaceItem(name: 'Workspace 5'),
-      WorkspaceItem(name: 'Workspace 6'),
+      WorkspaceItem(name: 'Workspace 7'),
+      WorkspaceItem(name: 'Workspace 8'),
+      WorkspaceItem(name: 'Workspace 9'),
+      WorkspaceItem(name: 'Workspace 10'),
+      WorkspaceItem(name: 'Workspace 11'),
+      WorkspaceItem(name: 'Workspace 12'),
+      WorkspaceItem(name: 'Workspace 13'),
+      WorkspaceItem(name: 'Workspace 14'),
+      WorkspaceItem(name: 'Workspace 15'),
+      WorkspaceItem(name: 'Workspace 16'),
     ];
 
     return Scaffold(
       body: Stack(
-        fit: StackFit.expand, // Make the stack fit the size of its parent
+        fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/images/backgroundHomePage.jpeg', // Replace with your background image path
+            'assets/images/backgroundHomePage.jpeg',
             fit: BoxFit.cover,
           ),
           Padding(
@@ -53,7 +61,7 @@ class Home extends StatelessWidget {
                                 },
                                 child: Container(
                                   width: double.infinity,
-                                  height: 50, // Adjust height as needed
+                                  height: 70, // Adjust height as needed
                                   decoration: BoxDecoration(
                                     color: Colors.white, // Background color of the button
                                     borderRadius: BorderRadius.circular(10), // Border radius
@@ -84,7 +92,7 @@ class Home extends StatelessWidget {
                                 },
                                 child: Container(
                                   width: double.infinity,
-                                  height: 50, // Adjust height as needed
+                                  height: 70,
                                   decoration: BoxDecoration(
                                     color: Colors.white, // Background color of the button
                                     borderRadius: BorderRadius.circular(10), // Border radius

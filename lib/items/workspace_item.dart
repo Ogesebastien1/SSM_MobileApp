@@ -17,15 +17,13 @@ class WorkspaceButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // Perform action when the workspace button is pressed
-        print('Workspace ${workspace.name} pressed');
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             workspace.name,
-            style: const TextStyle(fontSize: 20),
+            style: const TextStyle(fontSize: 16),
           )
         ],
       ),
