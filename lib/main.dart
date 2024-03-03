@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ssm_oversight/pages/board.dart';
+import 'package:ssm_oversight/pages/workspace.dart';
 import './pages/home.dart';
 
 void main() {
@@ -13,6 +15,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         '/': (context) => const Home(),
+        '/workspace': (context) => const WorkspacePage(),
+        '/board': (context) => const BoardPage(),
       },
     );
   }

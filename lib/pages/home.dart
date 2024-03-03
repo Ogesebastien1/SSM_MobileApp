@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
 import '../items/workspace_item.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    List<WorkspaceItem> workspaces = [
-      WorkspaceItem(name: 'Workspace 1'),
-      WorkspaceItem(name: 'Workspace 2'),
-      WorkspaceItem(name: 'Workspace 3'),
-      WorkspaceItem(name: 'Workspace 4'),
-      WorkspaceItem(name: 'Workspace 5'),
-      WorkspaceItem(name: 'Workspace 7'),
-      WorkspaceItem(name: 'Workspace 8'),
-      WorkspaceItem(name: 'Workspace 9'),
-      WorkspaceItem(name: 'Workspace 10'),
-      WorkspaceItem(name: 'Workspace 11'),
-      WorkspaceItem(name: 'Workspace 12'),
-      WorkspaceItem(name: 'Workspace 13'),
-      WorkspaceItem(name: 'Workspace 14'),
-      WorkspaceItem(name: 'Workspace 15'),
-      WorkspaceItem(name: 'Workspace 16'),
-    ];
+  HomeState createState() => HomeState();
+}
 
+class HomeState extends State<Home> {
+  List<WorkspaceItem> workspaces = [
+    WorkspaceItem(name: 'Workspace 1'),
+    WorkspaceItem(name: 'Workspace 2'),
+    WorkspaceItem(name: 'Workspace 3'),
+    WorkspaceItem(name: 'Workspace 4'),
+    WorkspaceItem(name: 'Workspace 5'),
+    WorkspaceItem(name: 'Workspace 7'),
+    WorkspaceItem(name: 'Workspace 8'),
+    WorkspaceItem(name: 'Workspace 9'),
+    WorkspaceItem(name: 'Workspace 10'),
+    WorkspaceItem(name: 'Workspace 11'),
+    WorkspaceItem(name: 'Workspace 12'),
+    WorkspaceItem(name: 'Workspace 13'),
+    WorkspaceItem(name: 'Workspace 14'),
+    WorkspaceItem(name: 'Workspace 15'),
+    WorkspaceItem(name: 'Workspace 16'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -38,10 +43,10 @@ class Home extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(top: 150, left: 80, right: 8.0, bottom: 8.0), // Added top padding
+                  padding: EdgeInsets.only(top: 150, left: 80, right: 8.0, bottom: 8.0),
                   child: Text(
                     'My Workspaces',
-                    style: TextStyle(fontSize: 30, color: Colors.white), // Text color
+                    style: TextStyle(fontSize: 30, color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 16.0),
@@ -52,29 +57,7 @@ class Home extends StatelessWidget {
                         child: ListView.builder(
                           itemCount: (workspaces.length / 2).ceil(),
                           itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  // Handle button click here
-                                  print('Button ${workspaces[index].name} clicked.');
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 70, // Adjust height as needed
-                                  decoration: BoxDecoration(
-                                    color: Colors.white, // Background color of the button
-                                    borderRadius: BorderRadius.circular(10), // Border radius
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      workspaces[index].name, // Display workspace name
-                                      style: const TextStyle(color: Colors.black), // Text color
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
+                            return workspaceButton(index);
                           },
                         ),
                       ),
@@ -83,29 +66,7 @@ class Home extends StatelessWidget {
                         child: ListView.builder(
                           itemCount: (workspaces.length / 2).floor(),
                           itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  // Handle button click here
-                                  print('Button ${workspaces[index + (workspaces.length / 2).ceil()].name} clicked.');
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 70,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white, // Background color of the button
-                                    borderRadius: BorderRadius.circular(10), // Border radius
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      workspaces[index + (workspaces.length / 2).ceil()].name, // Display workspace name
-                                      style: const TextStyle(color: Colors.black), // Text color
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
+                            return workspaceButton(index + (workspaces.length / 2).ceil());
                           },
                         ),
                       ),
@@ -116,6 +77,32 @@ class Home extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget workspaceButton(int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: GestureDetector(
+        onTap: () {
+          // Handle button click here
+          print('Button ${workspaces[index].name} clicked.');
+        },
+        child: Container(
+          width: double.infinity,
+          height: 70,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              workspaces[index].name,
+              style: const TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
     );
   }
