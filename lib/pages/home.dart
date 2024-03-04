@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../items/Workspace.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key});
+  const Home({super.key});
 
   @override
   HomeState createState() => HomeState();
