@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../items/workspace_item.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({Key? key});
 
   @override
   HomeState createState() => HomeState();
@@ -78,6 +78,15 @@ class HomeState extends State<Home> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Add new workspace
+          setState(() {
+            workspaces.add(WorkspaceItem(name: 'New Workspace'));
+          });
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -86,8 +95,41 @@ class HomeState extends State<Home> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: GestureDetector(
         onTap: () {
-          // Handle button click here
-          print('Button ${workspaces[index].name} clicked.');
+          showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return Container(
+                child: Wrap(
+                  children: <Widget>[
+                    ListTile(
+                      leading: const Icon(Icons.edit),
+                      title: const Text('Edit Workspace'),
+                      onTap: () {
+                        // Implement edit functionality here
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.delete),
+                      title: const Text('Delete Workspace'),
+                      onTap: () {
+                        // Implement delete functionality here
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.open_in_browser),
+                      title: const Text('Open Workspace'),
+                      onTap: () {
+                        Navigator.pop(context); // Close the bottom sheet
+                        Navigator.pushNamed(context, '/workspace');
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
         },
         child: Container(
           width: double.infinity,
