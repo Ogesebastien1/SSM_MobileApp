@@ -7,7 +7,7 @@ class WorkspaceItem {
   WorkspaceItem({required this.name});
 }
 
-// Custom widget representing the workspace item
+// Custom widget representing the workspace item.
 class WorkspaceButton extends StatelessWidget {
   final WorkspaceItem workspace;
 
