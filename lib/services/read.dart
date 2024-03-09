@@ -2,24 +2,40 @@ import "package:http/http.dart" as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-var apiKey = dotenv.env['API_KEY'];
-var apiToken = dotenv.env['SECRET_TOKEN'];
-var memberId = dotenv.env['ACCOUNT_ID'];
+// Ensure dotenv is loaded before calling these variables.
+Future<void> initEnv() async {
+  await dotenv.load();
+}
 
-// get workspaces
-Future<http.Response> getWorkspaces() async {
+Future<List<dynamic>> getWorkspaces() async {
 
-  var url = Uri.parse('https://api.trello.com/1/members/$memberId/organizations?key=$apiKey&token=$apiToken');
+  final apiKey = dotenv.env['API_KEY'];
+  final apiToken = dotenv.env['SECRET_TOKEN'];
+  final memberId = dotenv.env['ACCOUNT_ID'];
+
+  if (apiKey == null || apiToken == null || memberId == null) {
+    throw Exception('API Key, Token, or Member ID is missing in the .env file.');
+  }
+
+  var url = Uri.https('api.trello.com', '/1/members/$memberId/organizations', {
+    'key': apiKey,
+    'token': apiToken,
+  });
 
   var response = await http.get(url, headers: {
     'Accept': 'application/json',
   });
 
   if (response.statusCode == 200) {
+    
     var jsonResponse = jsonDecode(response.body);
     print(jsonResponse);
-    return response;
-  }
 
-  return jsonDecode(response.statusCode.toString());
+    return jsonResponse;
+
+  } else {
+
+    throw Exception('Failed to retrieve workspaces: ${response.statusCode} ${response.body}');
+
+  }
 }

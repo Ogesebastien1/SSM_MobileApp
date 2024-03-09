@@ -1,31 +1,30 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../items/workspace.dart';
 import '../services/read.dart';
+import '../services/update.dart';
+import '../services/delete.dart';
+import '../services/create.dart'; 
 
 class Home extends StatefulWidget {
-  const Home({super.key, value});
+  const Home({super.key});
 
   @override
   HomeState createState() => HomeState();
 }
 
 class HomeState extends State<Home> {
+  List<WorkspaceItem> workspaces = [];
+
   @override
   void initState() {
     super.initState();
     fetchData();
   }
 
-  // Moved fetchData() inside the HomeState class
   void fetchData() async {
     try {
-      var response = await getWorkspaces(); // Fetch the data
-      // Assuming the response is a JSON array, parse it as a list of maps
-      List<dynamic> workspaceMaps = jsonDecode(response.body);
-
+      List<dynamic> workspaceMaps = await getWorkspaces();
       List<WorkspaceItem> workspaceItems = workspaceMaps.map((workspaceMap) {
-        // Assuming WorkspaceItem has a named constructor that takes a Map
         return WorkspaceItem.fromMap(workspaceMap as Map<String, dynamic>);
       }).toList();
 
@@ -33,12 +32,9 @@ class HomeState extends State<Home> {
         workspaces = workspaceItems;
       });
     } catch (error) {
-      // Handle or display the error
       print('An error occurred: $error');
     }
   }
-
-  List<WorkspaceItem> workspaces = [];
 
   @override
   Widget build(BuildContext context) {
@@ -92,12 +88,9 @@ class HomeState extends State<Home> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add new workspace
-          setState(() {
-            workspaces.add(WorkspaceItem(name: 'New Workspace'));
-          });
-        },
+          onPressed: () {
+            showCreateWorkspaceDialog();
+          },
         child: const Icon(Icons.add),
       ),
     );
@@ -118,15 +111,16 @@ class HomeState extends State<Home> {
                       leading: const Icon(Icons.edit),
                       title: const Text('Edit Workspace'),
                       onTap: () {
-                        // Implement edit functionality here
-                        Navigator.pop(context);
+                        Navigator.pop(context); // Close the bottom sheet first
+                        var workspaceId = workspaces[index].id; // Assuming WorkspaceItem has an 'id' property
+                        showEditDialog(workspaceId, workspaces[index].name);
                       },
                     ),
                     ListTile(
                       leading: const Icon(Icons.delete),
                       title: const Text('Delete Workspace'),
                       onTap: () {
-                        // Implement delete functionality here
+                        deleteWorkspaceItem(workspaces[index].id);
                         Navigator.pop(context);
                       },
                     ),
@@ -134,7 +128,7 @@ class HomeState extends State<Home> {
                       leading: const Icon(Icons.open_in_browser),
                       title: const Text('Open Workspace'),
                       onTap: () {
-                        Navigator.pop(context); // Close the bottom sheet
+                        Navigator.pop(context); 
                         Navigator.pushNamed(context, '/workspace');
                       },
                     ),
@@ -159,6 +153,127 @@ class HomeState extends State<Home> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> showEditDialog(String workspaceId, String currentName) async {
+    TextEditingController nameController = TextEditingController(text: currentName);
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Workspace'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(hintText: "Enter new name"),
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Update'),
+              onPressed: () async {
+                try {
+                  await updateWorkspaceName(workspaceId, nameController.text);
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop(); // Close the dialog
+                    fetchData(); // Refresh workspace list
+                } catch (e) {
+                  if (e.toString().contains("Organization short name is taken")) {
+                    // Handle the specific error, e.g., show an error message to the user
+                    showErrorDialog("The workspace name is already taken. Please choose a different name.");
+                  } else {
+                    // Handle other errors
+                    showErrorDialog("An error occurred while updating the workspace.");
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteWorkspaceItem(String workspaceId) async {
+    try {
+      await deleteWorkspace(workspaceId);
+      fetchData(); // Refresh the list of workspaces after deletion
+    } catch (e) {
+      showErrorDialog("Failed to delete workspace: $e");
+    }
+  }
+
+  void showCreateWorkspaceDialog() async {
+    TextEditingController nameController = TextEditingController();
+
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Create New Workspace'),
+          content: TextField(
+            controller: nameController,
+            decoration: InputDecoration(hintText: 'Enter workspace name'),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('Create'),
+              onPressed: () async {
+                final String newName = nameController.text;
+                if (newName.isNotEmpty) {
+                  try {
+                    await addWorkspace(newName);
+                    Navigator.pop(context); // Close the dialog
+                    fetchData(); // Refresh the list of workspaces
+                  } catch (e) {
+                    showErrorDialog('Failed to create the workspace: $e');
+                  }
+                } else {
+                  showErrorDialog('Name cannot be empty.');
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
