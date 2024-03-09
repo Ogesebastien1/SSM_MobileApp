@@ -1,31 +1,44 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../items/workspace.dart';
+import '../services/read.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({super.key, value});
 
   @override
   HomeState createState() => HomeState();
 }
 
 class HomeState extends State<Home> {
-  List<WorkspaceItem> workspaces = [
-    WorkspaceItem(name: 'Workspace 1'),
-    WorkspaceItem(name: 'Workspace 2'),
-    WorkspaceItem(name: 'Workspace 3'),
-    WorkspaceItem(name: 'Workspace 4'),
-    WorkspaceItem(name: 'Workspace 5'),
-    WorkspaceItem(name: 'Workspace 7'),
-    WorkspaceItem(name: 'Workspace 8'),
-    WorkspaceItem(name: 'Workspace 9'),
-    WorkspaceItem(name: 'Workspace 10'),
-    WorkspaceItem(name: 'Workspace 11'),
-    WorkspaceItem(name: 'Workspace 12'),
-    WorkspaceItem(name: 'Workspace 13'),
-    WorkspaceItem(name: 'Workspace 14'),
-    WorkspaceItem(name: 'Workspace 15'),
-    WorkspaceItem(name: 'Workspace 16'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  // Moved fetchData() inside the HomeState class
+  void fetchData() async {
+    try {
+      var response = await getWorkspaces(); // Fetch the data
+      // Assuming the response is a JSON array, parse it as a list of maps
+      List<dynamic> workspaceMaps = jsonDecode(response.body);
+
+      List<WorkspaceItem> workspaceItems = workspaceMaps.map((workspaceMap) {
+        // Assuming WorkspaceItem has a named constructor that takes a Map
+        return WorkspaceItem.fromMap(workspaceMap as Map<String, dynamic>);
+      }).toList();
+
+      setState(() {
+        workspaces = workspaceItems;
+      });
+    } catch (error) {
+      // Handle or display the error
+      print('An error occurred: $error');
+    }
+  }
+
+  List<WorkspaceItem> workspaces = [];
 
   @override
   Widget build(BuildContext context) {

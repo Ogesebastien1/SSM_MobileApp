@@ -16,9 +16,3 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
-
-dependencies {
-    // https://mvnrepository.com/artifact/com.konghq/unirest-java
-    implementation 'com.konghq:unirest-java:4.0.0-RC2'
-
-}

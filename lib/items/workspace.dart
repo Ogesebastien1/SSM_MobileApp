@@ -5,6 +5,12 @@ class WorkspaceItem {
   final String name;
 
   WorkspaceItem({required this.name});
+
+  factory WorkspaceItem.fromMap(Map<String, dynamic> map) {
+    return WorkspaceItem(
+      name: map['name'],
+    );
+  }
 }
 
 // Custom widget representing the workspace item.

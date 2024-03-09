@@ -1,12 +1,13 @@
 import "package:http/http.dart" as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-var apiKey="";
-var apiToken="";
-var memberId="";
+var apiKey = dotenv.env['API_KEY'];
+var apiToken = dotenv.env['SECRET_TOKEN'];
+var memberId = dotenv.env['ACCOUNT_ID'];
 
 // get workspaces
-Future<void> getWorkspaces() async {
+Future<http.Response> getWorkspaces() async {
 
   var url = Uri.parse('https://api.trello.com/1/members/$memberId/organizations?key=$apiKey&token=$apiToken');
 
@@ -17,7 +18,8 @@ Future<void> getWorkspaces() async {
   if (response.statusCode == 200) {
     var jsonResponse = jsonDecode(response.body);
     print(jsonResponse);
-  } else {
-    print('Request failed with status: ${response.statusCode}.');
+    return response;
   }
+
+  return jsonDecode(response.statusCode.toString());
 }
