@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class BoardPage extends StatelessWidget {
   final String name;
 
-  const BoardPage({Key? key, required this.name}) : super(key: key);
+  const BoardPage({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@ import 'package:ssm_oversight/pages/board.dart';
 
 
 class Workspace extends StatefulWidget {
-  const Workspace({Key? key});
+  const Workspace({super.key, value});
 
   @override
   HomeState createState() => HomeState();
