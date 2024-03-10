@@ -2,32 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ssm_oversight/items/board.dart';
-import 'package:ssm_oversight/items/card.dart';
-import 'package:ssm_oversight/items/list.dart';
 import 'package:ssm_oversight/items/workspace.dart';
+// import 'package:ssm_oversight/items/card.dart';
+// import 'package:ssm_oversight/items/list.dart';
 
 import 'package:ssm_oversight/pages/board.dart';
-import 'package:ssm_oversight/pages/home.dart';
-import 'package:ssm_oversight/pages/workspace.dart';
+// import 'package:ssm_oversight/pages/home.dart';
+// import 'package:ssm_oversight/pages/workspace.dart';
 
-import 'package:ssm_oversight/services/create.dart';
-import 'package:ssm_oversight/services/delete.dart';
-import 'package:ssm_oversight/services/read.dart';
-import 'package:ssm_oversight/services/update.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:ssm_oversight/items/board.dart';
-import 'package:ssm_oversight/items/card.dart';
-import 'package:ssm_oversight/items/list.dart';
-import 'package:ssm_oversight/items/workspace.dart';
-import 'package:ssm_oversight/pages/board.dart';
-import 'package:ssm_oversight/pages/home.dart';
-import 'package:ssm_oversight/pages/workspace.dart';
-import 'package:ssm_oversight/services/create.dart';
-import 'package:ssm_oversight/services/delete.dart';
-import 'package:ssm_oversight/services/read.dart';
-import 'package:ssm_oversight/services/update.dart';
+// import 'package:ssm_oversight/services/create.dart';
+// import 'package:ssm_oversight/services/delete.dart';
+// import 'package:ssm_oversight/services/read.dart';
+// import 'package:ssm_oversight/services/update.dart';
+
+// import 'package:ssm_oversight/main.dart';
 
 void main() {
   group('Items', () {
@@ -62,7 +51,7 @@ void main() {
     group('Workspace', () {
       testWidgets('WorkspaceButton Renders Correctly', (WidgetTester tester) async {
         // Create a WorkspaceItem instance
-        final workspaceItem = WorkspaceItem(name: 'Test Workspace');
+        final workspaceItem = WorkspaceItem(name: 'Test Workspace', id: '');
 
         // Build the WorkspaceButton widget
         await tester.pumpWidget(MaterialApp(

@@ -211,11 +211,11 @@ class HomeState extends State<Home> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Error'),
+          title: const Text('Error'),
           content: Text(errorMessage),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -242,20 +242,20 @@ class HomeState extends State<Home> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Create New Workspace'),
+          title: const Text('Create New Workspace'),
           content: TextField(
             controller: nameController,
-            decoration: InputDecoration(hintText: 'Enter workspace name'),
+            decoration: const InputDecoration(hintText: 'Enter workspace name'),
           ),
           actions: [
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
             TextButton(
-              child: Text('Create'),
+              child: const Text('Create'),
               onPressed: () async {
                 final String newName = nameController.text;
                 if (newName.isNotEmpty) {
