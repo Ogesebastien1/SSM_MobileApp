@@ -7,7 +7,7 @@ import 'package:ssm_oversight/items/workspace.dart';
 // import 'package:ssm_oversight/items/list.dart';
 
 import 'package:ssm_oversight/pages/board.dart';
-// import 'package:ssm_oversight/pages/home.dart';
+import 'package:ssm_oversight/pages/home.dart';
 // import 'package:ssm_oversight/pages/workspace.dart';
 
 
@@ -70,7 +70,7 @@ void main() {
     });
   });
 
-  group('Pages', () {
+    group('Pages', () {
     group('Board', () {
       testWidgets('BoardPage Renders Correctly', (WidgetTester tester) async {
         // Create a test widget with the BoardPage
@@ -85,8 +85,39 @@ void main() {
         expect(find.text('Bienvenue sur le tableau Test Board'), findsOneWidget);
       });
     });
-    // Add tests for other pages here
+
+    group('Home', () {
+      testWidgets('Renders without crashing', (WidgetTester tester) async {
+        await tester.pumpWidget(const MaterialApp(
+          home: Home(),
+        ));
+        expect(find.byType(Home), findsOneWidget);
+      });
+
+      testWidgets('Adds workspace correctly', (WidgetTester tester) async {
+        await tester.pumpWidget(const MaterialApp(
+          home: Home(),
+        ));
+
+        // Verify that no workspace is initially shown
+        expect(find.byType(ListView), findsNWidgets(2));
+
+        // Tap the floating action button to add a workspace
+        await tester.tap(find.byType(FloatingActionButton));
+        await tester.pumpAndSettle();
+
+        // Verify that the dialog for creating a workspace is shown
+        expect(find.text('Create New Workspace'), findsOneWidget);
+
+        // Enter a workspace name and tap on the create button
+        await tester.enterText(find.byType(TextField), 'New Workspace');
+        await tester.tap(find.text('Create'));
+        await tester.pumpAndSettle();
+
+        // Verify that the workspace is added and shown on the page
+        expect(find.text('New Workspace'), findsOneWidget);
+      });
+    });
   });
 }
-
 
