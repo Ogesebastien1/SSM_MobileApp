@@ -8,6 +8,7 @@ import 'package:ssm_oversight/items/workspace.dart';
 
 import 'package:ssm_oversight/pages/board.dart';
 import 'package:ssm_oversight/pages/home.dart';
+import 'package:ssm_oversight/pages/workspace.dart';
 // import 'package:ssm_oversight/pages/workspace.dart';
 
 
@@ -117,7 +118,19 @@ void main() {
         // Verify that the workspace is added and shown on the page
         expect(find.text('New Workspace'), findsOneWidget);
       });
+   });
+   group('Workspace', () {
+      testWidgets('Workspace page renders without crashing', (WidgetTester tester) async {
+        // Build the Workspace page
+        await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(
+            body: Workspace(),
+          ),
+        ));
+
+        // Verify that the Workspace page renders without crashing
+        expect(find.byType(Workspace), findsOneWidget);
+      });
     });
   });
 }
-
