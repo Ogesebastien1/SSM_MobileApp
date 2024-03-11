@@ -7,10 +7,17 @@ class CardData {
   CardData({required this.title, required this.description});
 }
 
+class ListData {
+  String name;
+  List<CardData> cards;
+
+  ListData({required this.name, required this.cards});
+}
+
 class BoardPage extends StatefulWidget {
   final String name;
 
-  const BoardPage({super.key, required this.name});
+  const BoardPage({Key? key, required this.name}) : super(key: key);
 
   @override
   _BoardPageState createState() => _BoardPageState();
@@ -18,13 +25,15 @@ class BoardPage extends StatefulWidget {
 
 class _BoardPageState extends State<BoardPage> {
   final TextEditingController _listNameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final List<CardData> _cards = []; // Liste pour stocker les données des cartes
+  final TextEditingController _cardTitleController = TextEditingController();
+  final TextEditingController _cardDescriptionController = TextEditingController();
+  List<ListData> _lists = []; // A list to store multiple lists with cards
 
   @override
   void dispose() {
     _listNameController.dispose();
-    _descriptionController.dispose();
+    _cardTitleController.dispose();
+    _cardDescriptionController.dispose();
     super.dispose();
   }
 
@@ -34,18 +43,9 @@ class _BoardPageState extends State<BoardPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Create new list'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _listNameController,
-                decoration: const InputDecoration(hintText: 'Name of list'),
-              ),
-              TextField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(hintText: 'Description'),
-              ),
-            ],
+          content: TextField(
+            controller: _listNameController,
+            decoration: const InputDecoration(hintText: 'Name of list'),
           ),
           actions: <Widget>[
             TextButton(
@@ -55,17 +55,11 @@ class _BoardPageState extends State<BoardPage> {
             TextButton(
               child: const Text('Create'),
               onPressed: () {
-                if (_listNameController.text.isNotEmpty && _descriptionController.text.isNotEmpty) {
-                  // Add the new card data to the cards list
+                if (_listNameController.text.isNotEmpty) {
                   setState(() {
-                    _cards.add(CardData(
-                      title: _listNameController.text,
-                      description: _descriptionController.text,
-                    ));
+                    _lists.add(ListData(name: _listNameController.text, cards: []));
+                    _listNameController.clear();
                   });
-                  // Clear the text fields after use
-                  _listNameController.clear();
-                  _descriptionController.clear();
                   Navigator.of(context).pop(); // Close the dialog
                 }
               },
@@ -76,40 +70,83 @@ class _BoardPageState extends State<BoardPage> {
     );
   }
 
-  void _showCardDetailsDialog(CardData card) {
+  void _showAddCardDialog(int listIndex) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-          title: Text(card.title),
+          title: const Text('Add new card'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                'Description:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              TextField(
+                controller: _cardTitleController,
+                decoration: const InputDecoration(hintText: 'Title'),
               ),
-              SizedBox(height: 10),
-              Text(card.description),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Logique pour supprimer la carte
-                  setState(() {
-                    _cards.remove(card);
-                  });
-                  Navigator.pop(context);
-                },
-                child: Text('Delete'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
+              TextField(
+                controller: _cardDescriptionController,
+                decoration: const InputDecoration(hintText: 'Description'),
               ),
             ],
           ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Add'),
+              onPressed: () {
+                if (_cardTitleController.text.isNotEmpty && _cardDescriptionController.text.isNotEmpty) {
+                  setState(() {
+                    _lists[listIndex].cards.add(CardData(
+                      title: _cardTitleController.text,
+                      description: _cardDescriptionController.text,
+                    ));
+                    _cardTitleController.clear();
+                    _cardDescriptionController.clear();
+                  });
+                  Navigator.of(context).pop(); // Close the dialog
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCardDetailsDialog(int listIndex, int cardIndex) {
+    CardData card = _lists[listIndex].cards[cardIndex];
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(card.title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(card.description),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                setState(() {
+                  _lists[listIndex].cards.removeAt(cardIndex);
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
       },
     );
@@ -119,39 +156,32 @@ class _BoardPageState extends State<BoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name), // Affiche le nom du tableau dans l'AppBar
+        title: Text(widget.name),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton.icon(
-              onPressed: _showCreateListDialog,
+      body: ListView.builder(
+        itemCount: _lists.length,
+        itemBuilder: (context, listIndex) {
+          var listData = _lists[listIndex];
+          return ExpansionTile(
+            title: Text(listData.name),
+            children: List.generate(listData.cards.length, (cardIndex) {
+              CardData card = listData.cards[cardIndex];
+              return ListTile(
+                title: Text(card.title),
+                subtitle: Text(card.description),
+                onTap: () => _showCardDetailsDialog(listIndex, cardIndex),
+              );
+            }),
+            trailing: IconButton(
               icon: const Icon(Icons.add),
-              label: const Text('Create new list'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
+              onPressed: () => _showAddCardDialog(listIndex),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _cards.length,
-              itemBuilder: (context, index) {
-                final card = _cards[index];
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(card.title),
-                    subtitle: Text(card.description),
-                    onTap: () => _showCardDetailsDialog(card),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showCreateListDialog,
+        child: const Icon(Icons.add),
       ),
     );
   }
