@@ -10,7 +10,7 @@ class CardData {
 class BoardPage extends StatefulWidget {
   final String name;
 
-  const BoardPage({Key? key, required this.name}) : super(key: key);
+  const BoardPage({super.key, required this.name});
 
   @override
   _BoardPageState createState() => _BoardPageState();
