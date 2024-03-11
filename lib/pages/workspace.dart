@@ -11,23 +11,7 @@ class Workspace extends StatefulWidget {
 }
 
 class HomeState extends State<Workspace> {
-  List<BoardItem> board = [
-    BoardItem (name: 'Board 1'),
-    BoardItem (name: 'Board 2'),
-    BoardItem (name: 'Board 3'),
-    BoardItem (name: 'Board 4'),
-    BoardItem (name: 'Board 5'),
-    BoardItem (name: 'Board 7'),
-    BoardItem (name: 'Board 8'),
-    BoardItem (name: 'Board 9'),
-    BoardItem (name: 'Board 10'),
-    BoardItem (name: 'Board 11'),
-    BoardItem (name: 'Board 12'),
-    BoardItem (name: 'Board 13'),
-    BoardItem (name: 'Board 14'),
-    BoardItem (name: 'Board 15'),
-    BoardItem (name: 'Board 16'),
-  ];
+  List<BoardItem> board = [];
 
 @override
 Widget build(BuildContext context) {
@@ -71,7 +55,7 @@ Widget build(BuildContext context) {
                         child: ListView.builder(
                           itemCount: (board.length / 2).ceil(),
                           itemBuilder: (BuildContext context, int index) {
-                            return workspaceButton(index);
+                            return boardButton(index);
                           },
                         ),
                       ),
@@ -80,7 +64,7 @@ Widget build(BuildContext context) {
                         child: ListView.builder(
                           itemCount: (board.length / 2).floor(),
                           itemBuilder: (BuildContext context, int index) {
-                            return workspaceButton(index + (board .length / 2).ceil());
+                            return boardButton(index + (board .length / 2).ceil());
                           },
                         ),
                       ),
@@ -96,7 +80,7 @@ Widget build(BuildContext context) {
         onPressed: () {
           // Add new workspace
           setState(() {
-            board.add(BoardItem(name: 'New Workspace'));
+            board.add(BoardItem(name: 'New Board'));
           });
         },
         child: const Icon(Icons.add),
@@ -104,7 +88,7 @@ Widget build(BuildContext context) {
     );
   }
 
-  Widget workspaceButton(int index) {
+  Widget boardButton(int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: GestureDetector(
