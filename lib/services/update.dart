@@ -37,3 +37,30 @@ Future<http.Response> updateWorkspaceName(String id, String name) async {
     throw Exception('Failed to update workspace: ${response.statusCode} ${response.body}');
   }
 }
+
+// update boards name
+Future<http.Response> updateBoard(String idBoard, String name) async {
+
+  if (idBoard.isEmpty || name.isEmpty) {
+    throw ArgumentError('ID and name cannot be empty.');
+  }
+
+  var url = Uri.https('api.trello.com', '/1/boards/$idBoard', {
+    'name': name,
+    'key': apiKey,
+    'token': apiToken,
+  });
+
+  // PUT request
+  var response = await http.put(url, headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  });
+
+  if (response.statusCode == 200) {
+    print('Board updated successfully.');
+    return response;
+  } else {
+    throw Exception('Failed to update Board : ${response.statusCode} ${response.body}');
+  }
+}
