@@ -226,58 +226,90 @@ Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
       title: Text(widget.name),
+      centerTitle: true,
     ),
-    body: ListView.builder(
-      itemCount: _lists.length,
-      itemBuilder: (context, listIndex) {
-        var listData = _lists[listIndex];
-        return Card(
-          child: ExpansionTile(
-            title: Text(listData.name),
-            children: <Widget>[
-              for (var card in listData.cards)
-                ListTile(
-                  title: Text(card.title),
-                  subtitle: Text(card.description),
-                  onTap: () => _showCardDetailsDialog(listIndex, listData.cards.indexOf(card)),
+    body: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: _showCreateListDialog,
+            child: Text('Create new list'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor, 
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _lists.length,
+            itemBuilder: (context, listIndex) {
+              var listData = _lists[listIndex];
+              return Card(
+                child: ExpansionTile(
+                  title: Text(listData.name),
+                  children: <Widget>[
+                    for (var card in listData.cards)
+                      ListTile(
+                        title: Text(card.title),
+                        subtitle: Text(card.description),
+                        onTap: () => _showCardDetailsDialog(listIndex, listData.cards.indexOf(card)),
+                        trailing: Wrap(
+                          spacing: 12, // space between two icons
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () => _showEditCardDialog(listIndex, listData.cards.indexOf(card)),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                setState(() {
+                                  _lists[listIndex].cards.removeAt(listData.cards.indexOf(card));
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ListTile(
+                      title: Center(
+                        child: ElevatedButton.icon(
+                          icon: Icon(Icons.add),
+                          label: Text('Add Card'),
+                          onPressed: () => _showAddCardDialog(listIndex),
+                        ),
+                      ),
+                    )
+                  ],
                   trailing: Wrap(
+                    spacing: 12, // space between two icons
                     children: <Widget>[
                       IconButton(
                         icon: Icon(Icons.edit),
-                        onPressed: () => _showEditCardDialog(listIndex, listData.cards.indexOf(card)),
+                        onPressed: () => _showEditListDialog(listIndex),
                       ),
                       IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
                           setState(() {
-                            _lists[listIndex].cards.removeAt(listData.cards.indexOf(card));
+                            _lists.removeAt(listIndex);
                           });
                         },
                       ),
                     ],
                   ),
                 ),
-              ListTile(
-                title: TextButton.icon(
-                  icon: Icon(Icons.add),
-                  label: Text('Add Card'),
-                  onPressed: () => _showAddCardDialog(listIndex),
-                ),
-              )
-            ],
-            trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () => _showEditListDialog(listIndex),
-            ),
+              );
+            },
           ),
-        );
-      },
-    ),
-    floatingActionButton: FloatingActionButton(
-      onPressed: _showCreateListDialog,
-      child: Icon(Icons.add),
+        ),
+      ],
     ),
   );
 }
+
+
 
 }
