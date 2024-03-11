@@ -128,8 +128,7 @@ Widget build(BuildContext context) {
                       leading: const Icon(Icons.edit),
                       title: const Text('Edit Board'),
                       onTap: () {
-                        // Implement edit functionality here
-                        Navigator.pop(context);
+                        showEditBoard(boards[index].id, boards[index].name);
                       },
                     ),
                     ListTile(
@@ -220,6 +219,57 @@ Widget build(BuildContext context) {
     );
   }
 
+  Future<void> showEditBoard(String boardId, String currentName) async {
+      TextEditingController nameController = TextEditingController(text: currentName);
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false, // User must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Edit Board'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(hintText: "Enter new name"),
+                  )
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Update'),
+                onPressed: () async {
+                  try {
+                    await updateBoard(boardId, nameController.text);
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).pop(); // Close the dialog
+                      fetchData();
+                  } catch (e) {
+                    if (e.toString().contains("Board short name is taken")) {
+                      // Handle the specific error, e.g., show an error message to the user
+                      showErrorDialog("The Board name is already taken. Please choose a different name.");
+                    } else {
+                      // Handle other errors
+                      showErrorDialog("An error occurred while updating the Board.");
+                    }
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
   void showErrorDialog(String errorMessage) {
     showDialog(
       context: context,
@@ -239,4 +289,6 @@ Widget build(BuildContext context) {
       },
     );
   }
+
+  
 }
