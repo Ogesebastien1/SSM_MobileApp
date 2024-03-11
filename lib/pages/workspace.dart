@@ -1,17 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:ssm_oversight/items/board.dart';
 import 'package:ssm_oversight/pages/board.dart';
+import '../services/read.dart';
+import '../services/update.dart';
+import '../services/delete.dart';
+import '../services/create.dart'; 
 
 
 class Workspace extends StatefulWidget {
-  const Workspace({super.key, value});
+
+  final String workspaceId;
+
+  const Workspace({super.key, required this.workspaceId});
 
   @override
-  HomeState createState() => HomeState();
+  WorkspaceState createState() => WorkspaceState();
 }
 
-class HomeState extends State<Workspace> {
-  List<BoardItem> board = [];
+class WorkspaceState extends State<Workspace> {
+  List<BoardItem> boards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    try {
+      List<dynamic> boardMaps = await getWorkspaceBoards(widget.workspaceId);
+      List<BoardItem> boardItems = boardMaps.map((boardMap) {
+        return BoardItem.fromMap(boardMap as Map<String, dynamic>);
+      }).toList();
+
+      setState(() {
+        boards = boardItems;
+      });
+    } catch (error) {
+      print('An error occurred: $error');
+    }
+  }
 
 @override
 Widget build(BuildContext context) {
@@ -53,7 +81,7 @@ Widget build(BuildContext context) {
                     children: [
                       Expanded(
                         child: ListView.builder(
-                          itemCount: (board.length / 2).ceil(),
+                          itemCount: (boards.length / 2).ceil(),
                           itemBuilder: (BuildContext context, int index) {
                             return boardButton(index);
                           },
@@ -62,9 +90,9 @@ Widget build(BuildContext context) {
                       const SizedBox(width: 16.0),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: (board.length / 2).floor(),
+                          itemCount: (boards.length / 2).floor(),
                           itemBuilder: (BuildContext context, int index) {
-                            return boardButton(index + (board .length / 2).ceil());
+                            return boardButton(index + (boards.length / 2).ceil());
                           },
                         ),
                       ),
@@ -78,10 +106,7 @@ Widget build(BuildContext context) {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add new workspace
-          setState(() {
-            board.add(BoardItem(name: 'New Board'));
-          });
+          //showCreateBoardDialog();
         },
         child: const Icon(Icons.add),
       ),
@@ -123,7 +148,7 @@ Widget build(BuildContext context) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BoardPage(name: board[index].name),
+                            builder: (context) => BoardPage(name: boards[index].name),
                           ),
                         );
                       },
@@ -143,7 +168,7 @@ Widget build(BuildContext context) {
           ),
           child: Center(
             child: Text(
-              board[index].name,
+              boards[index].name,
               style: const TextStyle(color: Colors.black),
             ),
           ),

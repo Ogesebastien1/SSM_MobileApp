@@ -129,7 +129,7 @@ class HomeState extends State<Home> {
                       title: const Text('Open Workspace'),
                       onTap: () {
                         Navigator.pop(context); 
-                        Navigator.pushNamed(context, '/workspace');
+                        Navigator.pushNamed(context, '/workspace', arguments: {'workspaceId': workspaces[index].id},);
                       },
                     ),
                   ],
