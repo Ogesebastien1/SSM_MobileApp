@@ -106,7 +106,7 @@ Widget build(BuildContext context) {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //showCreateBoardDialog();
+          showCreateBoardDialog();
         },
         child: const Icon(Icons.add),
       ),
@@ -136,8 +136,9 @@ Widget build(BuildContext context) {
                       leading: const Icon(Icons.delete),
                       title: const Text('Delete Board'),
                       onTap: () {
-                        // Implement delete functionality here
+                        deleteBoard(boards[index].id);
                         Navigator.pop(context);
+                        fetchData();
                       },
                     ),
                      ListTile(
@@ -174,6 +175,68 @@ Widget build(BuildContext context) {
           ),
         ),
       ),
+    );
+  }
+
+  void showCreateBoardDialog() async {
+    TextEditingController nameController = TextEditingController();
+
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create New Board'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(hintText: 'Enter Board name'),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: const Text('Create'),
+              onPressed: () async {
+                final String newName = nameController.text;
+                if (newName.isNotEmpty) {
+                  try {
+                    await addBoard(newName, widget.workspaceId);
+                    Navigator.pop(context); // Close the dialog
+                    fetchData(); // Refresh the list of workspaces
+                  } catch (e) {
+                    showErrorDialog('Failed to create the Board: $e');
+                  }
+                } else {
+                  showErrorDialog('Name cannot be empty.');
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
