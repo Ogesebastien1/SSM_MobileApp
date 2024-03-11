@@ -38,13 +38,13 @@ Future<http.Response> deleteWorkspace(String id) async {
 }
 
 // delete Board function
-Future<http.Response> deleteBoard(String id) async {
+Future<http.Response> deleteBoard(String idBoard) async {
 
-  if (id.isEmpty) {
+  if (idBoard.isEmpty) {
     throw ArgumentError('ID, name or displayName cannot be empty.');
   }
 
-  var url = Uri.https('api.trello.com', '/1/organizations/$id', {
+  var url = Uri.https('api.trello.com', '/1/boards/$idBoard', {
     'key': apiKey,
     'token': apiToken,
   });
@@ -56,9 +56,9 @@ Future<http.Response> deleteBoard(String id) async {
   });
 
   if (response.statusCode == 200) {
-    print('Workspace delete successfully.');
+    print('board delete successfully.');
     return response;
   } else {
-    throw Exception('Failed to delete workspace: ${response.statusCode} ${response.body}');
+    throw Exception('Failed to delete board: ${response.statusCode} ${response.body}');
   }
 }
