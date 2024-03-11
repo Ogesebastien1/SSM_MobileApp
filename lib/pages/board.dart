@@ -1,18 +1,6 @@
 import 'package:flutter/material.dart';
-
-class CardData {
-  String title;
-  String description;
-
-  CardData({required this.title, required this.description});
-}
-
-class ListData {
-  String name;
-  List<CardData> cards;
-
-  ListData({required this.name, required this.cards});
-}
+import 'package:ssm_oversight/items/card.dart';
+import 'package:ssm_oversight/items/list.dart';
 
 class BoardPage extends StatefulWidget {
   final String name;

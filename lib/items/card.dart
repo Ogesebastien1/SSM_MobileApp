@@ -1,6 +1,6 @@
-class CardItem {
+class CardData {
   String title;
-  String details;
+  String description;
 
-  CardItem({required this.title, required this.details});
+  CardData({required this.title, required this.description});
 }
