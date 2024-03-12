@@ -147,7 +147,7 @@ class WorkspaceState extends State<Workspace> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BoardPage(name: boards[index].name),
+                            builder: (context) => BoardPage(boardId: boards[index].id, name: boards[index].name),
                           ),
                         );
                       },
