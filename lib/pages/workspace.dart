@@ -40,41 +40,56 @@ class WorkspaceState extends State<Workspace> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/images/backgroundHomePage.jpeg',
-            fit: BoxFit.cover,
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top,
-            left: 0,
-            child: SafeArea(
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-          ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 150, left: 80, right: 8.0, bottom: 8.0),
-                    child: Text(
-                      'My Board',
-                      style: TextStyle(fontSize: 30, color: Colors.white),
-                    ),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      title: Text('Workspace'),
+    ),
+    body: Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          'assets/images/backgroundHomePage.jpeg',
+          fit: BoxFit.cover,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 150, left: 8.0, right: 8.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'My Boards',
+                    style: TextStyle(fontSize: 30, color: Colors.white),
                   ),
-                  const SizedBox(height: 16.0),
+                ),
+              ),
+              SizedBox(height: 16.0),
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // The function to show the dialog for creating a new workspace
+                    showCreateBoardDialog();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple, // Button color
+                    foregroundColor: Colors.white, // Text color
+                    shape: StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                  ),
+                  child: const Text('Create new board'),
+                ),
+              ),
+              const SizedBox(height: 20), // Adjust the space as needed
                   Expanded(
                     child: Row(
                       children: [
@@ -103,12 +118,7 @@ class WorkspaceState extends State<Workspace> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showCreateBoardDialog();
-          },
-          child: const Icon(Icons.add),
-        ),
+     
       );
   }
 

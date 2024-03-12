@@ -36,29 +36,49 @@ class HomeState extends State<Home> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/images/backgroundHomePage.jpeg',
-            fit: BoxFit.cover,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 150, left: 80, right: 8.0, bottom: 8.0),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          'assets/images/backgroundHomePage.jpeg',
+          fit: BoxFit.cover,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 150, left: 8.0, right: 8.0),
+                child: Align(
+                  alignment: Alignment.center,
                   child: Text(
                     'My Workspaces',
                     style: TextStyle(fontSize: 30, color: Colors.white),
                   ),
                 ),
-                const SizedBox(height: 16.0),
+              ),
+              SizedBox(height: 16.0),
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // The function to show the dialog for creating a new workspace
+                    showCreateWorkspaceDialog();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple, // Button color
+                    foregroundColor: Colors.white, // Text color
+                    shape: StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                  ),
+                  child: const Text('Create new workspace'),
+                ),
+              ),
+              const SizedBox(height: 20), // Adjust the space as needed
                 Expanded(
                   child: Row(
                     children: [
@@ -87,14 +107,9 @@ class HomeState extends State<Home> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showCreateWorkspaceDialog();
-          },
-        child: const Icon(Icons.add),
-      ),
     );
   }
+
 
   Widget workspaceButton(int index) {
     return Padding(

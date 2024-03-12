@@ -57,11 +57,14 @@ class _BoardPageState extends State<BoardPage> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.name),
         centerTitle: true,
       ),
+
+
       body: Column(
         children: [
           Padding(
