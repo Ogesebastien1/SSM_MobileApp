@@ -222,59 +222,70 @@ class _BoardPageState extends State<BoardPage> {
       },
     );
   }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.name),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: _showCreateListDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor, 
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Create new list'),
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(widget.name),
+      centerTitle: true,
+    ),
+    body: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: _showCreateListDialog,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor, 
+              foregroundColor: Colors.white,
             ),
+            child: const Text('Create new list'),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _lists.length,
-              itemBuilder: (context, listIndex) {
-                var listData = _lists[listIndex];
-                return Card(
-                  child: ExpansionTile(
-                    title: Text(listData.name),
-                    trailing: Wrap(
-                      spacing: 12, // space between two icons
-                      children: <Widget>[
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () => _showEditListDialog(listIndex),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            setState(() {
-                              _lists.removeAt(listIndex);
-                            });
-                          },
-                        ),
-                      ],
-                    ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _lists.length,
+            itemBuilder: (context, listIndex) {
+              var listData = _lists[listIndex];
+              return Card(
+                margin: EdgeInsets.all(8.0),
+                child: ExpansionTile(
+                  title: Text(
+                    listData.name,
+                    style: TextStyle(fontWeight: FontWeight.bold), 
+                  ),
+                  trailing: Wrap(
+                    spacing: 12,
                     children: <Widget>[
-                      for (var card in listData.cards)
-                        ListTile(
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => _showEditListDialog(listIndex),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          setState(() {
+                            _lists.removeAt(listIndex);
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  children: <Widget>[
+                    for (var card in listData.cards)
+                      Container(
+                        margin: EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+                        decoration: BoxDecoration(
+                          color: Colors.lightBlue.shade100, 
+                          border: Border.all(color: Colors.purple),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: ListTile(
                           title: Text(card.title),
                           subtitle: Text(card.description),
                           onTap: () => _showCardDetailsDialog(listIndex, listData.cards.indexOf(card)),
                           trailing: Wrap(
-                            spacing: 12, // space between two icons
+                            spacing: 12,
                             children: <Widget>[
                               IconButton(
                                 icon: const Icon(Icons.edit),
@@ -291,24 +302,26 @@ class _BoardPageState extends State<BoardPage> {
                             ],
                           ),
                         ),
-                      ListTile(
-                        title: Center(
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.add),
-                            label: const Text('Add Card'),
-                            onPressed: () => _showAddCardDialog(listIndex),
-                          ),
+                      ),
+                    ListTile(
+                      title: Center(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.add),
+                          label: const Text('Add Card'),
+                          onPressed: () => _showAddCardDialog(listIndex),
                         ),
-                      )
-                    ],
-                    
-                  ),
-                );
-              },
-            ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
+
 }
