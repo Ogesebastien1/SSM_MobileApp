@@ -24,7 +24,7 @@ void main() {
     group('Board', () {
       testWidgets('BoardButton Renders Correctly', (WidgetTester tester) async {
         // Create a BoardItem instance
-        final boardItem = BoardItem(name: 'Test Board');
+        final boardItem = BoardItem(id:'' , name: 'Test Board');
 
         // Build the BoardButton widget
         await tester.pumpWidget(MaterialApp(
@@ -124,7 +124,7 @@ void main() {
         // Build the Workspace page
         await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-            body: Workspace(),
+            body: Workspace(workspaceId: 'test-workspace-id'),
           ),
         ));
 

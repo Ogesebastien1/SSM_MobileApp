@@ -10,7 +10,7 @@ var apiKey = dotenv.env['API_KEY'];
 var apiToken = dotenv.env['SECRET_TOKEN'];
 // var memberId = dotenv.env['ACCOUNT_ID'];
 
-// update workspace's name
+// create workspace's name
 Future<http.Response> addWorkspace(String name) async {
 
   if (name.isEmpty) {
@@ -35,5 +35,34 @@ Future<http.Response> addWorkspace(String name) async {
     return response;
   } else {
     throw Exception('Failed to create workspace: ${response.statusCode} ${response.body}');
+  }
+}
+
+
+// create board
+Future<http.Response> addBoard(String name, String workspaceId) async {
+
+  if (name.isEmpty) {
+    throw ArgumentError('Name cannot be empty.');
+  }
+
+  var url = Uri.https('api.trello.com', '/1/boards/', {
+    'idOrganization': workspaceId,
+    'name': name,
+    'key': apiKey,
+    'token': apiToken,
+  });
+
+  // POST request
+  var response = await http.post(url, headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  });
+
+  if (response.statusCode == 200) {
+    print('Board created successfully.');
+    return response;
+  } else {
+    throw Exception('Failed to create boards: ${response.statusCode} ${response.body}');
   }
 }
