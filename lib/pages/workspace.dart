@@ -4,8 +4,7 @@ import 'package:ssm_oversight/pages/board.dart';
 import '../services/read.dart';
 import '../services/update.dart';
 import '../services/delete.dart';
-import '../services/create.dart'; 
-
+import '../services/create.dart';
 
 class Workspace extends StatefulWidget {
 
@@ -41,76 +40,76 @@ class WorkspaceState extends State<Workspace> {
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.asset(
-          'assets/images/backgroundHomePage.jpeg',
-          fit: BoxFit.cover,
-        ),
-        Positioned(
-          top: MediaQuery.of(context).padding.top,
-          left: 0,
-          child: SafeArea(
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/backgroundHomePage.jpeg',
+            fit: BoxFit.cover,
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top,
+            left: 0,
+            child: SafeArea(
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
             ),
           ),
-        ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 150, left: 80, right: 8.0, bottom: 8.0),
-                  child: Text(
-                    'My Board',
-                    style: TextStyle(fontSize: 30, color: Colors.white),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 150, left: 80, right: 8.0, bottom: 8.0),
+                    child: Text(
+                      'My Board',
+                      style: TextStyle(fontSize: 30, color: Colors.white),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16.0),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: (boards.length / 2).ceil(),
-                          itemBuilder: (BuildContext context, int index) {
-                            return boardButton(index);
-                          },
+                  const SizedBox(height: 16.0),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: (boards.length / 2).ceil(),
+                            itemBuilder: (BuildContext context, int index) {
+                              return boardButton(index);
+                            },
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: (boards.length / 2).floor(),
-                          itemBuilder: (BuildContext context, int index) {
-                            return boardButton(index + (boards.length / 2).ceil());
-                          },
+                        const SizedBox(width: 16.0),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: (boards.length / 2).floor(),
+                            itemBuilder: (BuildContext context, int index) {
+                              return boardButton(index + (boards.length / 2).ceil());
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showCreateBoardDialog();
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showCreateBoardDialog();
+          },
+          child: const Icon(Icons.add),
+        ),
+      );
   }
 
   Widget boardButton(int index) {
@@ -128,6 +127,7 @@ Widget build(BuildContext context) {
                       leading: const Icon(Icons.edit),
                       title: const Text('Edit Board'),
                       onTap: () {
+                        Navigator.pop(context);
                         showEditBoard(boards[index].id, boards[index].name);
                       },
                     ),
@@ -135,9 +135,8 @@ Widget build(BuildContext context) {
                       leading: const Icon(Icons.delete),
                       title: const Text('Delete Board'),
                       onTap: () {
-                        deleteBoard(boards[index].id);
+                        deleteBoardItem(boards[index].id);
                         Navigator.pop(context);
-                        fetchData();
                       },
                     ),
                      ListTile(
@@ -175,6 +174,15 @@ Widget build(BuildContext context) {
         ),
       ),
     );
+  }
+
+  void deleteBoardItem(String boardId) async {
+    try {
+      await deleteBoard(boardId);
+      fetchData();
+    } catch (e) {
+      showErrorDialog("Failed to delete board: $e");
+    }
   }
 
   void showCreateBoardDialog() async {
