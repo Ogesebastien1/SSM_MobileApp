@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 
 // Define a class for the board item
 class BoardItem {
+  final String id;
   final String name;
 
-  BoardItem({required this.name});
+  BoardItem({required this.id, required this.name});
+
+    factory BoardItem.fromMap(Map<String, dynamic> map) {
+    return BoardItem(
+      id: map['id'], //'id' is the key in the response
+      name: map['name'],
+    );
+  }
 }
 
 // Custom widget representing the board item.
