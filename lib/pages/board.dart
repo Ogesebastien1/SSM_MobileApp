@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:ssm_oversight/items/card.dart';
+import 'package:ssm_oversight/items/card.dart'; 
 import 'package:ssm_oversight/items/list.dart';
 import '../services/read.dart';
-import '../services/update.dart';
-import '../services/delete.dart';
-import '../services/create.dart';
+
 
 class BoardPage extends StatefulWidget {
   final String boardId;
   final String name;
 
-  const BoardPage({super.key, required this.boardId, required this.name});
+  const BoardPage({Key? key, required this.boardId, required this.name}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _BoardPageState createState() => _BoardPageState();
 }
 
@@ -24,18 +21,7 @@ class _BoardPageState extends State<BoardPage> {
   final TextEditingController _editListNameController = TextEditingController();
   final TextEditingController _editCardTitleController = TextEditingController();
   final TextEditingController _editCardDescriptionController = TextEditingController();
-  List<ListItem> _lists = []; // A list to store multiple lists with cards
-
-  @override
-  void dispose() {
-    _listNameController.dispose();
-    _cardTitleController.dispose();
-    _cardDescriptionController.dispose();
-    _editListNameController.dispose();
-    _editCardTitleController.dispose();
-    _editCardDescriptionController.dispose();
-    super.dispose();
-  }
+  List<ListItem> _lists = [];
 
   @override
   void initState() {
@@ -59,6 +45,17 @@ class _BoardPageState extends State<BoardPage> {
   }
 
   @override
+  void dispose() {
+    _listNameController.dispose();
+    _cardTitleController.dispose();
+    _cardDescriptionController.dispose();
+    _editListNameController.dispose();
+    _editCardTitleController.dispose();
+    _editCardDescriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -72,7 +69,7 @@ class _BoardPageState extends State<BoardPage> {
             child: ElevatedButton(
               onPressed: _showCreateListDialog,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor, 
+                backgroundColor: Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Create new list'),
@@ -82,13 +79,13 @@ class _BoardPageState extends State<BoardPage> {
             child: ListView.builder(
               itemCount: _lists.length,
               itemBuilder: (context, listIndex) {
-                var ListItem = _lists[listIndex];
+                var listItem = _lists[listIndex];
                 return Card(
                   margin: EdgeInsets.all(8.0),
                   child: ExpansionTile(
                     title: Text(
-                      ListItem.name,
-                      style: TextStyle(fontWeight: FontWeight.bold), 
+                      listItem.name,
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     trailing: Wrap(
                       spacing: 12,
@@ -100,40 +97,40 @@ class _BoardPageState extends State<BoardPage> {
                         IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () {
-                            setState(() {
-                              _lists.removeAt(listIndex);
-                            });
+                            _showDeleteListDialog(listIndex);
                           },
                         ),
                       ],
                     ),
                     children: <Widget>[
-                      for (var card in ListItem.cards)
+                      for (var card in listItem.cards)
                         Container(
-                          margin: EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+                          margin: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
                           decoration: BoxDecoration(
-                            color: Colors.lightBlue.shade100, 
+                            color: Colors.lightBlue.shade100,
                             border: Border.all(color: Colors.purple),
                             borderRadius: BorderRadius.circular(4.0),
                           ),
                           child: ListTile(
                             title: Text(card.title),
                             subtitle: Text(card.description),
-                            onTap: () => _showCardDetailsDialog(listIndex, ListItem.cards.indexOf(card)),
+                            onTap: () => _showCardDetailsDialog(listIndex, listItem.cards.indexOf(card)),
                             trailing: Wrap(
                               spacing: 12,
                               children: <Widget>[
                                 IconButton(
                                   icon: const Icon(Icons.edit),
-                                  onPressed: () => _showEditCardDialog(listIndex, ListItem.cards.indexOf(card)),
+                                  onPressed: () => _showEditCardDialog(listIndex, listItem.cards.indexOf(card)),
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete),
                                   onPressed: () {
-                                    setState(() {
-                                      _lists[listIndex].cards.removeAt(ListItem.cards.indexOf(card));
-                                    });
+                                    _showDeleteCardDialog(listIndex, listItem.cards.indexOf(card));
                                   },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.swap_horiz),
+                                  onPressed: () => _moveCardDialog(listIndex, listItem.cards.indexOf(card)),
                                 ),
                               ],
                             ),
@@ -158,7 +155,74 @@ class _BoardPageState extends State<BoardPage> {
       ),
     );
   }
+// Function to show dialog for deleting a card
+void _showDeleteCardDialog(int listIndex, int cardIndex) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Delete Card'),
+        content: Text('Are you sure you want to delete this card?'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Delete'),
+            onPressed: () {
+              setState(() {
+                _lists[listIndex].cards.removeAt(cardIndex);
+              });
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+  // Function to move a card to another list
+  void _moveCardDialog(int currentListIndex, int cardIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Move Card to Another List'),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _lists.length,
+              itemBuilder: (BuildContext context, int index) {
+                // Avoid showing the current list as an option
+                if (index == currentListIndex) return Container();
+                return ListTile(
+                  title: Text(_lists[index].name),
+                  onTap: () {
+                    // Move the card to the selected list
+                    setState(() {
+                      CardData card = _lists[currentListIndex].cards.removeAt(cardIndex);
+                      _lists[index].cards.add(card);
+                    });
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  // Function to show dialog for creating a new list
   void _showCreateListDialog() {
     showDialog(
       context: context,
@@ -191,7 +255,7 @@ class _BoardPageState extends State<BoardPage> {
       },
     );
   }
-
+  // Function to show dialog for adding a new card to a list
   void _showAddCardDialog(int listIndex) {
     showDialog(
       context: context,
@@ -237,6 +301,36 @@ class _BoardPageState extends State<BoardPage> {
       },
     );
   }
+
+  // Function to show dialog for deleting a list
+  void _showDeleteListDialog(int listIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete List'),
+          content: Text('Are you sure you want to delete this list?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                setState(() {
+                  _lists.removeAt(listIndex);
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to show dialog for editing a list name
   void _showEditListDialog(int listIndex) {
     _editListNameController.text = _lists[listIndex].name;
     showDialog(
@@ -270,6 +364,7 @@ class _BoardPageState extends State<BoardPage> {
     );
   }
 
+  // Function to show dialog for editing a card
   void _showEditCardDialog(int listIndex, int cardIndex) {
     _editCardTitleController.text = _lists[listIndex].cards[cardIndex].title;
     _editCardDescriptionController.text = _lists[listIndex].cards[cardIndex].description;
@@ -314,6 +409,7 @@ class _BoardPageState extends State<BoardPage> {
     );
   }
 
+  // Function to show dialog for card details
   void _showCardDetailsDialog(int listIndex, int cardIndex) {
     CardData card = _lists[listIndex].cards[cardIndex];
     showDialog(
