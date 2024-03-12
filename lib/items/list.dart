@@ -1,8 +1,8 @@
 import 'card.dart'; 
 
 class ListData {
-  String title;
-  List<CardItem> cards;
+  String name;
+  List<CardData> cards;
 
-  ListData({required this.title, this.cards = const []});
+  ListData({required this.name, required this.cards});
 }

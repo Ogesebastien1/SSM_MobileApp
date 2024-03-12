@@ -1,25 +1,14 @@
 import 'package:flutter/material.dart';
-
-class CardData {
-  String title;
-  String description;
-
-  CardData({required this.title, required this.description});
-}
-
-class ListData {
-  String name;
-  List<CardData> cards;
-
-  ListData({required this.name, required this.cards});
-}
+import 'package:ssm_oversight/items/card.dart';
+import 'package:ssm_oversight/items/list.dart';
 
 class BoardPage extends StatefulWidget {
   final String name;
 
-  const BoardPage({Key? key, required this.name}) : super(key: key);
+  const BoardPage({super.key, required this.name});
 
   @override
+  // ignore: library_private_types_in_public_api
   _BoardPageState createState() => _BoardPageState();
 }
 
@@ -27,13 +16,19 @@ class _BoardPageState extends State<BoardPage> {
   final TextEditingController _listNameController = TextEditingController();
   final TextEditingController _cardTitleController = TextEditingController();
   final TextEditingController _cardDescriptionController = TextEditingController();
-  List<ListData> _lists = []; // A list to store multiple lists with cards
+  final TextEditingController _editListNameController = TextEditingController();
+  final TextEditingController _editCardTitleController = TextEditingController();
+  final TextEditingController _editCardDescriptionController = TextEditingController();
+  final List<ListData> _lists = []; // A list to store multiple lists with cards
 
   @override
   void dispose() {
     _listNameController.dispose();
     _cardTitleController.dispose();
     _cardDescriptionController.dispose();
+    _editListNameController.dispose();
+    _editCardTitleController.dispose();
+    _editCardDescriptionController.dispose();
     super.dispose();
   }
 
@@ -115,6 +110,82 @@ class _BoardPageState extends State<BoardPage> {
       },
     );
   }
+  void _showEditListDialog(int listIndex) {
+    _editListNameController.text = _lists[listIndex].name;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit list name'),
+          content: TextField(
+            controller: _editListNameController,
+            decoration: const InputDecoration(hintText: 'New name of list'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Update'),
+              onPressed: () {
+                if (_editListNameController.text.isNotEmpty) {
+                  setState(() {
+                    _lists[listIndex].name = _editListNameController.text;
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditCardDialog(int listIndex, int cardIndex) {
+    _editCardTitleController.text = _lists[listIndex].cards[cardIndex].title;
+    _editCardDescriptionController.text = _lists[listIndex].cards[cardIndex].description;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit card'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: _editCardTitleController,
+                decoration: const InputDecoration(hintText: 'Title'),
+              ),
+              TextField(
+                controller: _editCardDescriptionController,
+                decoration: const InputDecoration(hintText: 'Description'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Update'),
+              onPressed: () {
+                if (_editCardTitleController.text.isNotEmpty && _editCardDescriptionController.text.isNotEmpty) {
+                  setState(() {
+                    _lists[listIndex].cards[cardIndex].title = _editCardTitleController.text;
+                    _lists[listIndex].cards[cardIndex].description = _editCardDescriptionController.text;
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _showCardDetailsDialog(int listIndex, int cardIndex) {
     CardData card = _lists[listIndex].cards[cardIndex];
@@ -151,37 +222,92 @@ class _BoardPageState extends State<BoardPage> {
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.name),
+        centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: _lists.length,
-        itemBuilder: (context, listIndex) {
-          var listData = _lists[listIndex];
-          return ExpansionTile(
-            title: Text(listData.name),
-            children: List.generate(listData.cards.length, (cardIndex) {
-              CardData card = listData.cards[cardIndex];
-              return ListTile(
-                title: Text(card.title),
-                subtitle: Text(card.description),
-                onTap: () => _showCardDetailsDialog(listIndex, cardIndex),
-              );
-            }),
-            trailing: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => _showAddCardDialog(listIndex),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: _showCreateListDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor, 
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Create new list'),
             ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreateListDialog,
-        child: const Icon(Icons.add),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _lists.length,
+              itemBuilder: (context, listIndex) {
+                var listData = _lists[listIndex];
+                return Card(
+                  child: ExpansionTile(
+                    title: Text(listData.name),
+                    trailing: Wrap(
+                      spacing: 12, // space between two icons
+                      children: <Widget>[
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () => _showEditListDialog(listIndex),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            setState(() {
+                              _lists.removeAt(listIndex);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    children: <Widget>[
+                      for (var card in listData.cards)
+                        ListTile(
+                          title: Text(card.title),
+                          subtitle: Text(card.description),
+                          onTap: () => _showCardDetailsDialog(listIndex, listData.cards.indexOf(card)),
+                          trailing: Wrap(
+                            spacing: 12, // space between two icons
+                            children: <Widget>[
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () => _showEditCardDialog(listIndex, listData.cards.indexOf(card)),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  setState(() {
+                                    _lists[listIndex].cards.removeAt(listData.cards.indexOf(card));
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ListTile(
+                        title: Center(
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add Card'),
+                            onPressed: () => _showAddCardDialog(listIndex),
+                          ),
+                        ),
+                      )
+                    ],
+                    
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
