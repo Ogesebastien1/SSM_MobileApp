@@ -7,7 +7,7 @@ class BoardItem {
 
   BoardItem({required this.id, required this.name});
 
-    factory BoardItem.fromMap(Map<String, dynamic> map) {
+  factory BoardItem.fromMap(Map<String, dynamic> map) {
     return BoardItem(
       id: map['id'], //'id' is the key in the response
       name: map['name'],

@@ -18,14 +18,20 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       // Define the theme, title, home, etc... if needed
       routes: {
-      '/': (context) => const Home(), // La page d'accueil
+      '/': (context) => const Home(), // the home page
       '/workspace': (context) {
         // Retrieve the workspace ID passed as an argument
         final args = ModalRoute.of(context)!.settings.arguments as Map;
         final workspaceId = args['workspaceId'];
         return Workspace(workspaceId: workspaceId);
       },
-      '/board': (context) => const BoardPage(name: 'My Board Name'), // La page du tableau
+      '/board': (context) {
+        // Retrieve the workspace ID passed as an argument
+        final arguments = ModalRoute.of(context)!.settings.arguments as Map;
+        final boardId = arguments['boardId'];
+        final boardName = arguments['name'];
+        return BoardPage(boardId: boardId, name: boardName,); // the board page
+      },
     });
   }
 }

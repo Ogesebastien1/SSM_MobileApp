@@ -1,19 +1,493 @@
 import 'package:flutter/material.dart';
+import 'package:ssm_oversight/items/card.dart'; 
+import 'package:ssm_oversight/items/list.dart';
+import '../services/read.dart';
+import '../services/update.dart';
+import '../services/create.dart';
+import '../services/delete.dart';
 
-class BoardPage extends StatelessWidget {
+class BoardPage extends StatefulWidget {
+  final String boardId;
   final String name;
 
-  const BoardPage({super.key, required this.name});
+  const BoardPage({Key? key, required this.boardId, required this.name}) : super(key: key);
+
+  @override
+  _BoardPageState createState() => _BoardPageState();
+}
+
+class _BoardPageState extends State<BoardPage> {
+  final TextEditingController _listNameController = TextEditingController();
+  final TextEditingController _cardTitleController = TextEditingController();
+  final TextEditingController _cardDescriptionController = TextEditingController();
+  final TextEditingController _editListNameController = TextEditingController();
+  final TextEditingController _editCardTitleController = TextEditingController();
+  final TextEditingController _editCardDescriptionController = TextEditingController();
+  List<ListItem> _lists = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    try {
+      List<dynamic> listMaps = await getBoardLists(widget.boardId);
+      List<ListItem> listItems = listMaps.map((listMap) {
+        return ListItem.fromMap(listMap as Map<String, dynamic>);
+      }).toList();
+
+      setState(() {
+        _lists = listItems;
+      });
+    } catch (error) {
+      print('An error occurred: $error');
+    }
+  }
+
+  @override
+  void dispose() {
+    _listNameController.dispose();
+    _cardTitleController.dispose();
+    _cardDescriptionController.dispose();
+    _editListNameController.dispose();
+    _editCardTitleController.dispose();
+    _editCardDescriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text(name), // Affiche le nom du tableau dans l'AppBar
+        title: Text(widget.name),
+        centerTitle: true,
       ),
-      body: Center(
-        child: Text('Bienvenue sur le tableau $name'), // Affiche un message de bienvenue avec le nom du tableau
+
+
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: _showCreateListDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Create new list'),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _lists.length,
+              itemBuilder: (context, listIndex) {
+                var listItem = _lists[listIndex];
+                return Card(
+                  margin: EdgeInsets.all(8.0),
+                  child: ExpansionTile(
+                    title: Text(
+                      listItem.name,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    trailing: Wrap(
+                      spacing: 12,
+                      children: <Widget>[
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            _showEditListDialog(listIndex);
+                          } 
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            _showArchiveListDialog(listIndex);
+                          },
+                        ),
+                      ],
+                    ),
+                    children: <Widget>[
+                      for (var card in listItem.cards)
+                        Container(
+                          margin: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.lightBlue.shade100,
+                            border: Border.all(color: Colors.purple),
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                          child: ListTile(
+                            title: Text(card.title),
+                            subtitle: Text(card.description),
+                            onTap: () => _showCardDetailsDialog(listIndex, listItem.cards.indexOf(card)),
+                            trailing: Wrap(
+                              spacing: 12,
+                              children: <Widget>[
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () => _showEditCardDialog(listIndex, listItem.cards.indexOf(card)),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    _showDeleteCardDialog(listIndex, listItem.cards.indexOf(card));
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.swap_horiz),
+                                  onPressed: () => _moveCardDialog(listIndex, listItem.cards.indexOf(card)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ListTile(
+                        title: Center(
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add Card'),
+                            onPressed: () => _showAddCardDialog(listIndex),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
+    );
+  }
+// Function to show dialog for deleting a card
+void _showDeleteCardDialog(int listIndex, int cardIndex) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Delete Card'),
+        content: Text('Are you sure you want to delete this card?'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Delete'),
+            onPressed: () {
+              setState(() {
+                _lists[listIndex].cards.removeAt(cardIndex);
+              });
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+  // Function to move a card to another list
+  void _moveCardDialog(int currentListIndex, int cardIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Move Card to Another List'),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _lists.length,
+              itemBuilder: (BuildContext context, int index) {
+                // Avoid showing the current list as an option
+                if (index == currentListIndex) return Container();
+                return ListTile(
+                  title: Text(_lists[index].name),
+                  onTap: () {
+                    // Move the card to the selected list
+                    setState(() {
+                      CardData card = _lists[currentListIndex].cards.removeAt(cardIndex);
+                      _lists[index].cards.add(card);
+                    });
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to show dialog for creating a new list
+  void _showCreateListDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create new list'),
+          content: TextField(
+            controller: _listNameController,
+            decoration: const InputDecoration(hintText: 'Name of list'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Create'),
+              onPressed: () async {
+                final String newName = _listNameController.text;
+                if (newName.isNotEmpty) {
+                  try {
+                    await addList(newName, widget.boardId);
+                    Navigator.pop(context); // Close the dialog
+                    fetchData(); // Refresh the list of workspaces
+                  } catch (e) {
+                    showErrorDialog('Failed to create the List: $e');
+                  }
+                } else {
+                  showErrorDialog('Name cannot be empty.');
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  // Function to show dialog for adding a new card to a list
+  void _showAddCardDialog(int listIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add new card'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: _cardTitleController,
+                decoration: const InputDecoration(hintText: 'Title'),
+              ),
+              TextField(
+                controller: _cardDescriptionController,
+                decoration: const InputDecoration(hintText: 'Description'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Add'),
+              onPressed: () {
+                if (_cardTitleController.text.isNotEmpty && _cardDescriptionController.text.isNotEmpty) {
+                  setState(() {
+                    _lists[listIndex].cards.add(CardData(
+                      title: _cardTitleController.text,
+                      description: _cardDescriptionController.text,
+                    ));
+                    _cardTitleController.clear();
+                    _cardDescriptionController.clear();
+                  });
+                  Navigator.of(context).pop(); // Close the dialog
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to show dialog for deleting a list
+  void _showArchiveListDialog(int listIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Archive List'),
+          content: Text('Are you sure you want to archive this list?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Archive'),
+              onPressed: () async {
+                try {
+                  var idList = _lists[listIndex].id;
+                  await archiveList(idList); // lists can't be deleted in trello
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).pop();
+                  fetchData();
+                } catch (e) {
+                  showErrorDialog("Failed to archive board: $e");
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to show dialog for editing a list name
+  void _showEditListDialog(int listIndex) {
+    TextEditingController nameController = TextEditingController(text: _lists[listIndex].name);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit list name'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(hintText: 'New name of list'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Update'),
+              onPressed: () async {
+                try {
+                  var idList = _lists[listIndex].id;
+                  await updateList(idList, nameController.text);
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).pop(); // Close the dialog
+                  fetchData();
+                } catch (e) {
+                  if (e.toString().contains("List short name is taken")) {
+                    showErrorDialog("The list name is already taken. Please choose a different name.");
+                  } else {
+                    var error = e.toString();
+                    showErrorDialog("An error occurred while updating the list. -> $error");
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to show dialog for editing a card
+  void _showEditCardDialog(int listIndex, int cardIndex) {
+    _editCardTitleController.text = _lists[listIndex].cards[cardIndex].title;
+    _editCardDescriptionController.text = _lists[listIndex].cards[cardIndex].description;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit card'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: _editCardTitleController,
+                decoration: const InputDecoration(hintText: 'Title'),
+              ),
+              TextField(
+                controller: _editCardDescriptionController,
+                decoration: const InputDecoration(hintText: 'Description'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Update'),
+              onPressed: () {
+                if (_editCardTitleController.text.isNotEmpty && _editCardDescriptionController.text.isNotEmpty) {
+                  setState(() {
+                    _lists[listIndex].cards[cardIndex].title = _editCardTitleController.text;
+                    _lists[listIndex].cards[cardIndex].description = _editCardDescriptionController.text;
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to show dialog for card details
+  void _showCardDetailsDialog(int listIndex, int cardIndex) {
+    CardData card = _lists[listIndex].cards[cardIndex];
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(card.title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(card.description),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                setState(() {
+                  _lists[listIndex].cards.removeAt(cardIndex);
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

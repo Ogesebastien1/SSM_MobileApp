@@ -76,7 +76,7 @@ void main() {
       testWidgets('BoardPage Renders Correctly', (WidgetTester tester) async {
         // Create a test widget with the BoardPage
         await tester.pumpWidget(const MaterialApp(
-          home: BoardPage(name: 'Test Board'),
+          home: BoardPage(name: 'Test Board', boardId: '',),
         ));
 
         // Verify that the title in the AppBar matches the provided name
