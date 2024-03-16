@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:ssm_oversight/items/card.dart'; 
 import 'package:ssm_oversight/items/list.dart';
 import '../services/read.dart';
-
+import '../services/update.dart';
+import '../services/create.dart';
+import '../services/delete.dart';
 
 class BoardPage extends StatefulWidget {
   final String boardId;
@@ -95,12 +97,14 @@ class _BoardPageState extends State<BoardPage> {
                       children: <Widget>[
                         IconButton(
                           icon: const Icon(Icons.edit),
-                          onPressed: () => _showEditListDialog(listIndex),
+                          onPressed: () {
+                            _showEditListDialog(listIndex);
+                          } 
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () {
-                            _showDeleteListDialog(listIndex);
+                            _showArchiveListDialog(listIndex);
                           },
                         ),
                       ],
@@ -243,13 +247,18 @@ void _showDeleteCardDialog(int listIndex, int cardIndex) {
             ),
             TextButton(
               child: const Text('Create'),
-              onPressed: () {
-                if (_listNameController.text.isNotEmpty) {
-                  setState(() {
-                    _lists.add(ListItem(id: '', name: _listNameController.text, cards: []));
-                    _listNameController.clear();
-                  });
-                  Navigator.of(context).pop(); // Close the dialog
+              onPressed: () async {
+                final String newName = _listNameController.text;
+                if (newName.isNotEmpty) {
+                  try {
+                    await addList(newName, widget.boardId);
+                    Navigator.pop(context); // Close the dialog
+                    fetchData(); // Refresh the list of workspaces
+                  } catch (e) {
+                    showErrorDialog('Failed to create the List: $e');
+                  }
+                } else {
+                  showErrorDialog('Name cannot be empty.');
                 }
               },
             ),
@@ -306,25 +315,30 @@ void _showDeleteCardDialog(int listIndex, int cardIndex) {
   }
 
   // Function to show dialog for deleting a list
-  void _showDeleteListDialog(int listIndex) {
+  void _showArchiveListDialog(int listIndex) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete List'),
-          content: Text('Are you sure you want to delete this list?'),
+          title: const Text('Archive List'),
+          content: Text('Are you sure you want to archive this list?'),
           actions: <Widget>[
             TextButton(
               child: const Text('Cancel'),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                setState(() {
-                  _lists.removeAt(listIndex);
-                });
-                Navigator.of(context).pop(); // Close the dialog
+              child: const Text('Archive'),
+              onPressed: () async {
+                try {
+                  var idList = _lists[listIndex].id;
+                  await archiveList(idList); // lists can't be deleted in trello
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).pop();
+                  fetchData();
+                } catch (e) {
+                  showErrorDialog("Failed to archive board: $e");
+                }
               },
             ),
           ],
@@ -335,14 +349,14 @@ void _showDeleteCardDialog(int listIndex, int cardIndex) {
 
   // Function to show dialog for editing a list name
   void _showEditListDialog(int listIndex) {
-    _editListNameController.text = _lists[listIndex].name;
+    TextEditingController nameController = TextEditingController(text: _lists[listIndex].name);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Edit list name'),
           content: TextField(
-            controller: _editListNameController,
+            controller: nameController,
             decoration: const InputDecoration(hintText: 'New name of list'),
           ),
           actions: <Widget>[
@@ -352,12 +366,20 @@ void _showDeleteCardDialog(int listIndex, int cardIndex) {
             ),
             TextButton(
               child: const Text('Update'),
-              onPressed: () {
-                if (_editListNameController.text.isNotEmpty) {
-                  setState(() {
-                    _lists[listIndex].name = _editListNameController.text;
-                  });
-                  Navigator.of(context).pop();
+              onPressed: () async {
+                try {
+                  var idList = _lists[listIndex].id;
+                  await updateList(idList, nameController.text);
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).pop(); // Close the dialog
+                  fetchData();
+                } catch (e) {
+                  if (e.toString().contains("List short name is taken")) {
+                    showErrorDialog("The list name is already taken. Please choose a different name.");
+                  } else {
+                    var error = e.toString();
+                    showErrorDialog("An error occurred while updating the list. -> $error");
+                  }
                 }
               },
             ),
@@ -440,6 +462,26 @@ void _showDeleteCardDialog(int listIndex, int cardIndex) {
                 setState(() {
                   _lists[listIndex].cards.removeAt(cardIndex);
                 });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
                 Navigator.of(context).pop();
               },
             ),

@@ -66,3 +66,31 @@ Future<http.Response> addBoard(String name, String workspaceId) async {
     throw Exception('Failed to create boards: ${response.statusCode} ${response.body}');
   }
 }
+
+// create list
+Future<http.Response> addList(String name, String boardId) async {
+
+  if (name.isEmpty) {
+    throw ArgumentError('Name cannot be empty.');
+  }
+
+  var url = Uri.https('api.trello.com', '/1/lists', {
+    'idBoard': boardId,
+    'name': name,
+    'key': apiKey,
+    'token': apiToken,
+  });
+
+  // POST request
+  var response = await http.post(url, headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  });
+
+  if (response.statusCode == 200) {
+    print('List created successfully.');
+    return response;
+  } else {
+    throw Exception('Failed to create List: ${response.statusCode} ${response.body}');
+  }
+}

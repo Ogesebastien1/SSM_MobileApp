@@ -287,7 +287,6 @@ Widget build(BuildContext context) {
       );
     }
 
-
   void showErrorDialog(String errorMessage) {
     showDialog(
       context: context,
@@ -307,6 +306,4 @@ Widget build(BuildContext context) {
       },
     );
   }
-
-  
 }

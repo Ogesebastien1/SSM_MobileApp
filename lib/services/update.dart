@@ -64,3 +64,57 @@ Future<http.Response> updateBoard(String idBoard, String name) async {
     throw Exception('Failed to update Board : ${response.statusCode} ${response.body}');
   }
 }
+// update list name
+Future<void> updateList(String idList, String name) async {
+  if (idList.isEmpty || name.isEmpty) {
+    throw ArgumentError('ID and name cannot be empty.');
+  }
+
+  try {
+    var url = Uri.https('api.trello.com', '/1/lists/$idList', {
+      'name': name,
+      'key': apiKey,
+      'token': apiToken,
+    });
+
+    var response = await http.put(url, headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      print('List updated successfully.');
+    } else {
+      throw Exception('Failed to update list : ${response.statusCode} ${response.body}');
+    }
+  } catch (e) {
+    throw Exception('Failed to update list: $e');
+  }
+}
+
+// archive list function
+Future<http.Response> archiveList(String idList) async {
+  
+  if (idList.isEmpty) {
+    throw ArgumentError('ID cannot be empty.');
+  }
+
+  var url = Uri.https('api.trello.com', '/1/lists/$idList', {
+    'closed': 'true',
+    'key': apiKey,
+    'token': apiToken,
+  });
+
+  // PUT request
+  var response = await http.put(url, headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  });
+
+  if (response.statusCode == 200) {
+    print('list archived successfully.');
+    return response;
+  } else {
+    throw Exception('Failed to archive list: ${response.statusCode} ${response.body}');
+  }
+}

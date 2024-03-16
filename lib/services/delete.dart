@@ -15,7 +15,7 @@ var apiToken = dotenv.env['SECRET_TOKEN'];
 Future<http.Response> deleteWorkspace(String id) async {
 
   if (id.isEmpty) {
-    throw ArgumentError('ID, name or displayName cannot be empty.');
+    throw ArgumentError('ID cannot be empty.');
   }
 
   var url = Uri.https('api.trello.com', '/1/organizations/$id', {
@@ -41,7 +41,7 @@ Future<http.Response> deleteWorkspace(String id) async {
 Future<http.Response> deleteBoard(String idBoard) async {
 
   if (idBoard.isEmpty) {
-    throw ArgumentError('ID, name or displayName cannot be empty.');
+    throw ArgumentError('ID cannot be empty.');
   }
 
   var url = Uri.https('api.trello.com', '/1/boards/$idBoard', {
