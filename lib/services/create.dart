@@ -70,9 +70,8 @@ Future<http.Response> addBoard(String name, String workspaceId) async {
 
 
 // Function to create a board from a board template
-Future<void> createBoardFromTemplate({
-  required BoardTemplate boardTemplate,
-}) async {
+Future<http.Response> createBoardFromTemplate(String boardTemplateId, String workspaceId, String name) 
+async {
   const baseUrl = 'api.trello.com'; 
   const basePath = '/1/boards'; 
 
@@ -83,28 +82,25 @@ Future<void> createBoardFromTemplate({
     baseUrl,
     basePath,
     {
-      'idBoardSource': boardTemplate.templateId,
-      'name': boardTemplate.displayName,
-      'key': dotenv.env['API_KEY']!,
-      'token': dotenv.env['SECRET_TOKEN']!,
-      'displayName': boardTemplate.displayName,
+      'idOrganization': workspaceId,
+      'idBoardSource': boardTemplateId,
+      'name': name,
+      'key': apiKey,
+      'token': apiToken,
     },
   );
 
-  try {
-    final response = await http.post(url, headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    });
+  // POST request
+  var response = await http.post(url, headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  });
 
-    if (response.statusCode == 200) {
-      print('Board created successfully for board template: ${boardTemplate.displayName}');
-    } else {
-      throw Exception('Failed to create board for board template ${boardTemplate.displayName}: ${response.statusCode} ${response.body}');
-    }
-  } catch (e) {
-    print('Error creating board for board template ${boardTemplate.displayName}: $e');
-    rethrow; // Rethrow the exception to propagate it further if needed
+  if (response.statusCode == 200) {
+    print('Board created successfully.');
+    return response;
+  } else {
+    throw Exception('Failed to create boards: ${response.statusCode} ${response.body}');
   }
 }
 
