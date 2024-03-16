@@ -128,7 +128,7 @@ Widget build(BuildContext context) {
                       onTap: () {
                         Navigator.pop(context); // Close the bottom sheet first
                         var workspaceId = workspaces[index].id; // Assuming WorkspaceItem has an 'id' property
-                        showEditDialog(workspaceId, workspaces[index].name);
+                        showEditDialog(workspaceId, workspaces[index].displayName);
                       },
                     ),
                     ListTile(
@@ -162,7 +162,7 @@ Widget build(BuildContext context) {
           ),
           child: Center(
             child: Text(
-              workspaces[index].name,
+              workspaces[index].displayName,
               style: const TextStyle(color: Colors.black),
             ),
           ),

@@ -40,6 +40,24 @@ class WorkspaceState extends State<Workspace> {
     }
   }
 
+
+  void createBoardsFromTemplates() async {
+  try {
+    // List of board templates
+    final List<BoardTemplate> boardTemplates = [
+      BoardTemplate(templateId: '5c4efa1d25a9692173830e7f', displayName: 'Conduite de projet'),
+      BoardTemplate(templateId: '5e6005043fbdb55d9781821e', displayName: 'Kanban'),
+      BoardTemplate(templateId: '591ca6422428d5f5b2794aee', displayName: 'Agile'),
+    ];
+
+    for (final template in boardTemplates) {
+      await addBoardFromTemplate(widget.workspaceId, template.templateBoardId, template.displayName);
+    }
+  } catch (error) {
+    print('An error occurred while creating boards from templates: $error');
+  }
+}
+
 @override
 Widget build(BuildContext context) {
   return Scaffold(

@@ -52,7 +52,7 @@ void main() {
     group('Workspace', () {
       testWidgets('WorkspaceButton Renders Correctly', (WidgetTester tester) async {
         // Create a WorkspaceItem instance
-        final workspaceItem = WorkspaceItem(name: 'Test Workspace', id: '');
+        final workspaceItem = WorkspaceItem(name: 'Test Workspace', id: '', displayName: '');
 
         // Build the WorkspaceButton widget
         await tester.pumpWidget(MaterialApp(
