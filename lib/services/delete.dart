@@ -62,3 +62,29 @@ Future<http.Response> deleteBoard(String idBoard) async {
     throw Exception('Failed to delete board: ${response.statusCode} ${response.body}');
   }
 }
+
+// delete Card function
+Future<http.Response> deleteCard(String idCard) async {
+
+  if (idCard.isEmpty) {
+    throw ArgumentError('ID cannot be empty.');
+  }
+
+  var url = Uri.https('api.trello.com', '/1/cards/$idCard', {
+    'key': apiKey,
+    'token': apiToken,
+  });
+
+  // DELETE request
+  var response = await http.delete(url, headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  });
+
+  if (response.statusCode == 200) {
+    print('Card deleted successfully.');
+    return response;
+  } else {
+    throw Exception('Failed to delete card: ${response.statusCode} ${response.body}');
+  }
+}

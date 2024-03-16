@@ -107,3 +107,37 @@ Future<List<dynamic>> getBoardLists(String boardId) async {
     throw Exception('Failed to retrieve lists of board: ${response.statusCode} ${response.body}');
   }
 }
+
+// get cards of board
+//! the cards are not in list but in board.
+Future<List<dynamic>> getBoardCards(String boardId) async {
+
+  final apiKey = dotenv.env['API_KEY'];
+  final apiToken = dotenv.env['SECRET_TOKEN'];
+  //final memberId = dotenv.env['ACCOUNT_ID'];
+
+  if (apiKey == null || apiToken == null) {
+    throw Exception('API Key, Token is missing in the .env file.');
+  }
+
+  var url = Uri.https('api.trello.com', '/1/boards/$boardId/cards', {
+    'key': apiKey,
+    'token': apiToken,
+  });
+
+  var response = await http.get(url, headers: {
+    'Accept': 'application/json',
+  });
+
+  if (response.statusCode == 200) {
+    
+    var jsonResponse = jsonDecode(response.body);
+    print(jsonResponse);
+
+    return jsonResponse;
+
+  } else {
+
+    throw Exception('Failed to retrieve cards of board: ${response.statusCode} ${response.body}');
+  }
+}
