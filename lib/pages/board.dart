@@ -76,6 +76,10 @@ class _BoardPageState extends State<BoardPage> {
 
       body: Column(
         children: [
+           Image.asset(
+          'assets/images/j.jpg',
+          fit: BoxFit.cover,
+        ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(

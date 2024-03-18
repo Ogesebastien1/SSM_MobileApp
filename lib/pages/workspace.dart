@@ -57,7 +57,7 @@ Widget build(BuildContext context) {
       fit: StackFit.expand,
       children: [
         Image.asset(
-          'assets/images/backgroundHomePage.jpeg',
+          'assets/images/j.jpg',
           fit: BoxFit.cover,
         ),
         Padding(
