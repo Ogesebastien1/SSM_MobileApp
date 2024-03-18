@@ -51,7 +51,7 @@ Future<http.Response> addBoard(String name, String workspaceId) async {
     'idOrganization': workspaceId,
     'name': name,
     'key': apiKey,
-    'token': apiToken,
+    'token': apiToken,  
   });
 
   // POST request
@@ -74,9 +74,9 @@ Future<http.Response> createBoardFromTemplate(String boardTemplateId, String wor
 async {
   const baseUrl = 'api.trello.com'; 
   const basePath = '/1/boards'; 
-
   // Load environment variables
   await dotenv.load();
+  
 
   final url = Uri.https(
     baseUrl,
@@ -85,6 +85,7 @@ async {
       'idOrganization': workspaceId,
       'idBoardSource': boardTemplateId,
       'name': name,
+      'keepFromSource': 'cards',
       'key': apiKey,
       'token': apiToken,
     },
