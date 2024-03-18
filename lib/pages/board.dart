@@ -185,10 +185,9 @@ void _showDeleteCardDialog(int cardIndex) {
           ),
           TextButton(
             child: const Text('Delete'),
-            onPressed: () {
-              setState(() {
-                _cards.removeAt(cardIndex);
-              });
+            onPressed: () async{
+              await deleteCard(_cards[cardIndex].id);
+              fetchData();
               Navigator.of(context).pop(); // Close the dialog
             },
           ),
@@ -198,7 +197,7 @@ void _showDeleteCardDialog(int cardIndex) {
   );
 }
   // Function to move a card to another list
-  void _moveCardDialog(int currentListIndex, int cardIndex) {
+  void _moveCardDialog(int currentListIndex, int currentCardIndex) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -214,12 +213,12 @@ void _showDeleteCardDialog(int cardIndex) {
                 if (index == currentListIndex) return Container();
                 return ListTile(
                   title: Text(_lists[index].name),
-                  onTap: () {
+                  onTap: () async {
+                    var idList = _lists[index].id;
+                    print('idList => $idList');
                     // Move the card to the selected list
-                    setState(() {
-                      CardItem card = _cards.removeAt(cardIndex);
-                      _cards.add(card);
-                    });
+                    await updateCard(_cards[currentCardIndex].id, _lists[index].id, true);
+                    fetchData();
                     Navigator.of(context).pop(); // Close the dialog
                   },
                 );
@@ -289,10 +288,10 @@ void _showDeleteCardDialog(int cardIndex) {
                 controller: _cardTitleController,
                 decoration: const InputDecoration(hintText: 'Title'),
               ),
-              TextField(
-                controller: _cardDescriptionController,
-                decoration: const InputDecoration(hintText: 'Description'),
-              ),
+              // TextField(
+              //   controller: _cardDescriptionController,
+              //   decoration: const InputDecoration(hintText: 'Description'),
+              // ),
             ],
           ),
           actions: <Widget>[
@@ -302,20 +301,22 @@ void _showDeleteCardDialog(int cardIndex) {
             ),
             TextButton(
               child: const Text('Add'),
-              onPressed: () {
-                if (_cardTitleController.text.isNotEmpty && _cardDescriptionController.text.isNotEmpty) {
-                  setState(() {
-                    _cards.add(CardItem(
-                      id: '',
-                      name: _cardTitleController.text,
-                      idList: ''
-                    ));
+              onPressed: () async {
+                // && _cardDescriptionController.text.isNotEmpty
+                if (_cardTitleController.text.isNotEmpty) {
+                  try {
+                    await addCard(_cardTitleController.text, _lists[listIndex].id);
                     _cardTitleController.clear();
-                    _cardDescriptionController.clear();
-                  });
-                  Navigator.of(context).pop(); // Close the dialog
+                    //_cardDescriptionController.clear();
+                    Navigator.pop(context); // Close the dialog
+                    fetchData(); // Refresh the list of workspaces
+                  } catch (e) {
+                    showErrorDialog('Failed to create the Card: $e');
+                  }
+                } else {
+                  showErrorDialog('Title cannot be empty.');
                 }
-              },
+              }
             ),
           ],
         );
@@ -413,10 +414,10 @@ void _showDeleteCardDialog(int cardIndex) {
                 controller: _editCardTitleController,
                 decoration: const InputDecoration(hintText: 'Title'),
               ),
-              TextField(
-                controller: _editCardDescriptionController,
-                decoration: const InputDecoration(hintText: 'Description'),
-              ),
+              // TextField(
+              //   controller: _editCardDescriptionController,
+              //   decoration: const InputDecoration(hintText: 'Description'),
+              // ),
             ],
           ),
           actions: <Widget>[
@@ -426,12 +427,13 @@ void _showDeleteCardDialog(int cardIndex) {
             ),
             TextButton(
               child: const Text('Update'),
-              onPressed: () {
-                if (_editCardTitleController.text.isNotEmpty && _editCardDescriptionController.text.isNotEmpty) {
-                  setState(() {
-                    _cards[cardIndex].name = _editCardTitleController.text;
-                  });
-                  Navigator.of(context).pop();
+              onPressed: () async {
+                //&& _editCardDescriptionController.text.isNotEmpty
+                if (_editCardTitleController.text.isNotEmpty) {
+                  await updateCard(_cards[cardIndex].id, _editCardTitleController.text, false);
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop(); // Close the dialog
+                    fetchData();
                 }
               },
             ),
@@ -462,16 +464,7 @@ void _showDeleteCardDialog(int cardIndex) {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                setState(() {
-                  _cards.removeAt(cardIndex);
-                });
-                Navigator.of(context).pop();
-              },
-            ),
+            )
           ],
         );
       },
