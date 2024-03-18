@@ -1,5 +1,6 @@
 import "package:http/http.dart" as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:ssm_oversight/items/board.dart';
 
 // Ensure dotenv is loaded before calling these variables.
 Future<void> initEnv() async {
@@ -50,7 +51,7 @@ Future<http.Response> addBoard(String name, String workspaceId) async {
     'idOrganization': workspaceId,
     'name': name,
     'key': apiKey,
-    'token': apiToken,
+    'token': apiToken,  
   });
 
   // POST request
@@ -66,6 +67,49 @@ Future<http.Response> addBoard(String name, String workspaceId) async {
     throw Exception('Failed to create boards: ${response.statusCode} ${response.body}');
   }
 }
+
+
+// Function to create a board from a board template
+Future<http.Response> createBoardFromTemplate(String boardTemplateId, String workspaceId, String name) 
+async {
+  const baseUrl = 'api.trello.com'; 
+  const basePath = '/1/boards'; 
+  // Load environment variables
+  await dotenv.load();
+  
+
+  final url = Uri.https(
+    baseUrl,
+    basePath,
+    {
+      'idOrganization': workspaceId,
+      'idBoardSource': boardTemplateId,
+      'name': name,
+      'keepFromSource': 'cards',
+      'key': apiKey,
+      'token': apiToken,
+      
+    },
+  );
+
+  // POST request
+  var response = await http.post(url, headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  });
+
+  if (response.statusCode == 200) {
+    print('Board created successfully.');
+    return response;
+  } else {
+    throw Exception('Failed to create boards: ${response.statusCode} ${response.body}');
+  }
+}
+
+
+
+
+
 
 // create list
 Future<http.Response> addList(String name, String boardId) async {

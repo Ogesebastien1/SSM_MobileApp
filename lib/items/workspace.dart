@@ -4,14 +4,16 @@ import 'package:flutter/material.dart';
 class WorkspaceItem {
   final String id;
   final String name;
+  final String displayName;
 
 
-  WorkspaceItem({required this.id, required this.name});
+  WorkspaceItem({required this.id, required this.name, required this.displayName});
 
   factory WorkspaceItem.fromMap(Map<String, dynamic> map) {
     return WorkspaceItem(
       id: map['id'], //'id' is the key in the response
       name: map['name'],
+      displayName: map['displayName'],
     );
   }
 }

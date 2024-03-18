@@ -18,7 +18,6 @@ Future<http.Response> updateWorkspaceName(String id, String name) async {
   }
 
   var url = Uri.https('api.trello.com', '/1/organizations/$id', {
-    'name': name,
     'displayName': name,
     'key': apiKey,
     'token': apiToken,

@@ -18,6 +18,8 @@ class Workspace extends StatefulWidget {
 
 class WorkspaceState extends State<Workspace> {
   List<BoardItem> boards = [];
+  bool createFromTemplate = false;
+  
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class WorkspaceState extends State<Workspace> {
       print('An error occurred: $error');
     }
   }
+
 
 @override
 Widget build(BuildContext context) {
@@ -196,46 +199,89 @@ Widget build(BuildContext context) {
   }
 
   void showCreateBoardDialog() async {
-    TextEditingController nameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  String? selectedTemplate = 'Without template'; // Default selection
 
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Create New Board'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(hintText: 'Enter Board name'),
+  showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Create New Board'),
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(hintText: 'Enter Board name'),
+                ),
+                DropdownButton<String>(
+                  value: selectedTemplate,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedTemplate = newValue!;
+                    });
+                  },
+                  items: <String>['Without template', 'Agile', 'Go-to-market strategy', 'Kanban'] // Updated with 'Without template' option
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+              ],
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: const Text('Create'),
-              onPressed: () async {
-                final String newName = nameController.text;
-                if (newName.isNotEmpty) {
-                  try {
+          TextButton(
+            child: const Text('Create'),
+            onPressed: () async {
+              var newName = nameController.text;
+              if (newName.isNotEmpty) {
+                try {
+                  if (selectedTemplate != 'Without template') { // Check if template is selected
+                    var templateId; // Define templateId based on selectedTemplate
+                    // Set templateId based on selectedTemplate
+                    if (selectedTemplate == 'Agile') {
+                      templateId = '54c93f6f836da7c4865460d2'; // Agile template ID
+                       print('creating template Agile');
+                    } else if (selectedTemplate == 'Go-to-market strategy') {
+                      templateId = '57e1548d041d8599c91361f5'; // Project management
+                    } else if (selectedTemplate == 'Kanban') {
+                      templateId = '5e20e06c460b391727ce7a2b'; // Kanban template ID
+                    }
+                    print('creating template');
+                    // Create board from the selected template
+                    await createBoardFromTemplate(templateId, widget.workspaceId, newName);
+                  } else {
+                    // If 'Without template' selected, create a board without a template
                     await addBoard(newName, widget.workspaceId);
-                    Navigator.pop(context); // Close the dialog
-                    fetchData(); // Refresh the list of workspaces
-                  } catch (e) {
-                    showErrorDialog('Failed to create the Board: $e');
                   }
-                } else {
-                  showErrorDialog('Name cannot be empty.');
+                  Navigator.pop(context); // Close the dialog
+                  fetchData(); // Refresh the list of workspaces
+                } catch (e) {
+                  showErrorDialog('Failed to create the Board: $e');
                 }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+              } else {
+                showErrorDialog('Name cannot be empty.');
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   Future<void> showEditBoard(String boardId, String currentName) async {
       TextEditingController nameController = TextEditingController(text: currentName);

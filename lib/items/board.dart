@@ -15,6 +15,20 @@ class BoardItem {
   }
 }
 
+
+// Define a class to represent a board template
+class BoardTemplate {
+  final String templateId;
+  final String displayName;
+
+  BoardTemplate({
+    required this.templateId,
+    required this.displayName,
+  });
+
+  get templateBoardId => null;
+}
+
 // Custom widget representing the board item.
 class BoardButton extends StatelessWidget {
   final BoardItem board;
