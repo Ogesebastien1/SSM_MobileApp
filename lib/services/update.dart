@@ -84,9 +84,8 @@ Future<void> updateList(String idList, String name) async {
 
     if (response.statusCode == 200) {
       print('List updated successfully.');
-    } else {
-      throw Exception('Failed to update list : ${response.statusCode} ${response.body}');
     }
+
   } catch (e) {
     throw Exception('Failed to update list: $e');
   }
@@ -116,5 +115,58 @@ Future<http.Response> archiveList(String idList) async {
     return response;
   } else {
     throw Exception('Failed to archive list: ${response.statusCode} ${response.body}');
+  }
+}
+
+// update card name
+Future<void> updateCard(String idCard, String nameOrIdList, bool moving) async {
+  if (!moving){
+    if (idCard.isEmpty || nameOrIdList.isEmpty) {
+      throw ArgumentError('ID and name cannot be empty.');
+    }
+
+    try {
+      var url = Uri.https('api.trello.com', '/1/cards/$idCard', {
+        'name': nameOrIdList,
+        'key': apiKey,
+        'token': apiToken,
+      });
+
+      var response = await http.put(url, headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        print('Card updated successfully.');
+      }
+
+    } catch (e) {
+      throw Exception('Failed to update card: $e');
+    }
+  }else {
+    if (idCard.isEmpty || nameOrIdList.isEmpty) {
+      throw ArgumentError('IDs cannot be empty.');
+    }
+
+    try {
+      var url = Uri.https('api.trello.com', '/1/cards/$idCard', {
+        'idList': nameOrIdList,
+        'key': apiKey,
+        'token': apiToken,
+      });
+
+      var response = await http.put(url, headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        print('Card updated successfully.');
+      }
+
+    } catch (e) {
+      throw Exception('Failed to update card: $e');
+    }
   }
 }

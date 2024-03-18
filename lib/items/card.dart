@@ -1,6 +1,15 @@
-class CardData {
-  String title;
-  String description;
+class CardItem {
+  String id;
+  String name;
+  String idList;
 
-  CardData({required this.title, required this.description});
+  CardItem({required this.id, required this.name, required this.idList});
+
+  factory CardItem.fromMap(Map<String, dynamic> map) {
+    return CardItem(
+      id: map['id'], //'id' is the key in the response
+      name: map['name'],
+      idList: map['idList'],
+    );
+  }
 }
