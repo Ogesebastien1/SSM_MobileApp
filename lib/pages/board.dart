@@ -10,7 +10,7 @@ class BoardPage extends StatefulWidget {
   final String boardId;
   final String name;
 
-  const BoardPage({Key? key, required this.boardId, required this.name}) : super(key: key);
+  const BoardPage({super.key, required this.boardId, required this.name});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -95,7 +95,7 @@ class _BoardPageState extends State<BoardPage> {
                 child: ElevatedButton(
                   onPressed: _showCreateListDialog,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 27, 73, 75).withOpacity(0.9),
+                    backgroundColor: const Color.fromARGB(255, 46, 122, 147),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -105,7 +105,7 @@ class _BoardPageState extends State<BoardPage> {
                     'Create new list',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.black,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -184,11 +184,11 @@ class _BoardPageState extends State<BoardPage> {
                                 icon: const Icon(Icons.add),
                                 label: const Text(
                                   'Add Card',
-                                  style: TextStyle(color: Colors.black),
+                                  style: TextStyle(color: Colors.white),
                                 ),
                                 onPressed: () => _showAddCardDialog(listIndex),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromARGB(255, 100, 80, 112),
+                                  backgroundColor: const Color.fromARGB(255, 57, 117, 186),
                                 ),
                               ),
                             ),
@@ -213,16 +213,20 @@ void _showDeleteCardDialog(int cardIndex) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Delete Card'),
-        backgroundColor: const Color.fromARGB(255, 3, 59, 77), 
+      
+        title: const Text(
+          'Delete Card',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 46, 122, 147),
         content: const Text('Are you sure you want to delete this card?'),
         actions: <Widget>[
           TextButton(
-            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('Delete', style: TextStyle(color: Colors.black)),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
             onPressed: () async {
               await deleteCard(_cards[cardIndex].id);
               fetchData();
@@ -241,8 +245,11 @@ void _moveCardDialog(int currentListIndex, int currentCardIndex) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Move Card to Another List'),
-        backgroundColor: const Color.fromARGB(255, 3, 59, 77), 
+        title: const Text(
+          'Move Card to Another List',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 46, 122, 147), 
         content: Container(
           width: double.maxFinite,
           child: ListView.builder(
@@ -266,7 +273,7 @@ void _moveCardDialog(int currentListIndex, int currentCardIndex) {
         ),
         actions: <Widget>[
           TextButton(
-            child: const Text('Cancel', style: TextStyle(color: Colors.black)), 
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)), 
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -281,8 +288,12 @@ void _showEditCardDialog(int cardIndex) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Edit card'),
-        backgroundColor: const Color.fromARGB(255, 3, 59, 77), 
+        
+        title: const Text(
+          'Edit card',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 46, 122, 147), 
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -294,11 +305,11 @@ void _showEditCardDialog(int cardIndex) {
         ),
         actions: <Widget>[
           TextButton(
-            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('Update', style: TextStyle(color: Colors.black)),
+            child: const Text('Update', style: TextStyle(color: Colors.white)),
             onPressed: () async {
               if (_editCardTitleController.text.isNotEmpty) {
                 await updateCard(_cards[cardIndex].id, _editCardTitleController.text, false);
@@ -367,27 +378,34 @@ void _showEditCardDialog(int cardIndex) {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color.fromARGB(255, 27, 73, 75),
+          backgroundColor: const Color.fromARGB(255, 57, 117, 186),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0), 
           ),
-          title: const Text('Create new list'),
-          content: TextField(
-            controller: _listNameController,
-            decoration: const InputDecoration(hintText: 'Name of list'),
+           title: const Text(
+          'Create a new list',
+          style: TextStyle(color: Colors.white),
+        ),
+           content: TextField(
+          controller: _listNameController,
+          decoration: const InputDecoration(
+            hintText: 'Name of list',
+            hintStyle: TextStyle(color: Colors.white70),
           ),
+          style: const TextStyle(color: Colors.white),
+        ),
           actions: <Widget>[
             TextButton(
               child: const Text(
                 'Cancel',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white),
               ),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
               child: const Text(
                 'Create',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white),
               ),
               onPressed: () async {
                 final String newName = _listNameController.text;
@@ -416,8 +434,11 @@ void _showAddCardDialog(int listIndex) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Add new card'),
-        backgroundColor: const Color.fromARGB(255, 3, 59, 77),
+        title: const Text(
+          'Add new card',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 106, 147, 194),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -429,11 +450,17 @@ void _showAddCardDialog(int listIndex) {
         ),
         actions: <Widget>[
           TextButton(
-            child: const Text('Cancel'),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('Add'),
+            child: const Text(
+              'Add',
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () async {
               if (_cardTitleController.text.isNotEmpty) {
                 try {
@@ -455,21 +482,31 @@ void _showAddCardDialog(int listIndex) {
   );
 }
 
+
 void _showArchiveListDialog(int listIndex) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Archive List'),
-        backgroundColor:  const Color.fromARGB(255, 3, 59, 77),
+        title: const Text(
+          'Archive List',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 57, 117, 186),
         content: const Text('Are you sure you want to archive this list?'),
         actions: <Widget>[
           TextButton(
-            child: const Text('Cancel'),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('Archive'),
+            child: const Text(
+              'Archive',
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () async {
               try {
                 var idList = _lists[listIndex].id;
@@ -488,25 +525,30 @@ void _showArchiveListDialog(int listIndex) {
 }
 
 
+
 void _showEditListDialog(int listIndex) {
   TextEditingController nameController = TextEditingController(text: _lists[listIndex].name);
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Edit list name'),
-        backgroundColor:  const Color.fromARGB(255, 3, 59, 77),
+    
+        title: const Text(
+          'Edit list name',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor:  const Color.fromARGB(255, 57, 117, 186),
         content: TextField(
           controller: nameController,
           decoration: const InputDecoration(hintText: 'New name of list'),
         ),
         actions: <Widget>[
           TextButton(
-            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('Update', style: TextStyle(color: Colors.black)),
+            child: const Text('Update', style: TextStyle(color: Colors.white)),
             onPressed: () async {
               try {
                 var idList = _lists[listIndex].id;

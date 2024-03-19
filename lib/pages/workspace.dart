@@ -55,25 +55,20 @@ class _WorkspaceState extends State<Workspace> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 48.0),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Card(
-                    color: const Color.fromARGB(255, 27, 73, 75).withOpacity(0.9),
-                    margin: const EdgeInsets.symmetric(horizontal: 32.0),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'My Boards',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                SafeArea(
+  child: Container(
+    alignment: Alignment.topCenter,
+    padding: const EdgeInsets.only(top: 16.0), 
+    child: const Text(
+      'My Boards',
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Color.fromARGB(255, 116, 159, 168), // Text color
+      ),
+    ),
+  ),
+),
                 const SizedBox(height: 11.0),
                 Align(
                   alignment: Alignment.center,
@@ -92,7 +87,7 @@ class _WorkspaceState extends State<Workspace> {
                       'Create new board',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.black,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -200,7 +195,7 @@ class _WorkspaceState extends State<Workspace> {
               child: Text(
                 boards[index].name,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -230,22 +225,22 @@ class _WorkspaceState extends State<Workspace> {
       return AlertDialog(
         backgroundColor: const Color.fromARGB(255, 27, 73, 75),
         title: const Text(
-          'Create New Board',
-          style: TextStyle(color: Colors.black),
+          'Create a New Board',
+          style: TextStyle(color: Colors.white),
         ),
         content: TextField(
           controller: nameController,
-          style: const TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.white),
           decoration: const InputDecoration(
             hintText: 'Enter Board name',
-            hintStyle: TextStyle(color: Colors.black),
+            hintStyle: TextStyle(color: Colors.white),
           ),
         ),
         actions: [
           TextButton(
             child: const Text(
               'Cancel',
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
             onPressed: () {
               Navigator.pop(context);
@@ -254,7 +249,7 @@ class _WorkspaceState extends State<Workspace> {
           TextButton(
             child: const Text(
               'Create',
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
             onPressed: () async {
               var newName = nameController.text;

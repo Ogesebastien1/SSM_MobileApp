@@ -54,25 +54,21 @@ Widget build(BuildContext context) {
             // Espace pour créer un espace en haut de l'écran
             const SizedBox(height: 48.0),
             // Alignement pour centrer la carte horizontalement
-            Align(
-              alignment: Alignment.topCenter,
-              child: Card(
-                color: const Color.fromARGB(255, 27, 73, 75).withOpacity(0.9), 
-                margin: const EdgeInsets.symmetric(horizontal: 32.0), 
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'My Workspaces',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black, // Couleur du texte à l'intérieur de la carte
-                    ),
-                  ),
-                ),
-              ),
-            ),
+SafeArea(
+  child: Container(
+    alignment: Alignment.topCenter,
+    padding: const EdgeInsets.only(top: 16.0), 
+    child: const Text(
+      'My Workspaces',
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Color.fromARGB(255, 116, 159, 168), // Text color
+      ),
+    ),
+  ),
+),
+
             const SizedBox(height: 11.0),
             Align(
               alignment: Alignment.center,
@@ -92,7 +88,7 @@ Widget build(BuildContext context) {
                   'Create a new workspace',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -179,7 +175,7 @@ Widget build(BuildContext context) {
             child: Text(
               workspaces[index].displayName,
               style: const TextStyle(
-                color: Colors.black,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -293,21 +289,21 @@ Widget build(BuildContext context) {
         backgroundColor: const Color.fromARGB(255, 27, 73, 75), // Set background color
         title: const Text(
           'Create a New Workspace',
-          style: TextStyle(color: Colors.black), // Text color
+          style: TextStyle(color: Colors.white), // Text color
         ),
         content: TextField(
           controller: nameController,
-          style: const TextStyle(color: Colors.black), // Text color
+          style: const TextStyle(color: Colors.white), // Text color
           decoration: const InputDecoration(
             hintText: 'Enter your workspace name',
-            hintStyle: TextStyle(color: Colors.black), // Hint text color
+            hintStyle: TextStyle(color: Colors.white), // Hint text color
           ),
         ),
         actions: [
           TextButton(
             child: const Text(
               'Cancel',
-              style: TextStyle(color: Colors.black), // Button text color
+              style: TextStyle(color: Colors.white), // Button text color
             ),
             onPressed: () {
               Navigator.pop(context);
@@ -316,7 +312,7 @@ Widget build(BuildContext context) {
           TextButton(
             child: const Text(
               'Create',
-              style: TextStyle(color: Colors.black), // Button text color
+              style: TextStyle(color: Colors.white), // Button text color
             ),
             onPressed: () async {
               final String newName = nameController.text;
