@@ -51,9 +51,9 @@ Les tests peuvent être exécutés de différentes manières :
 
 Si vous avez des questions ou besoin de support, veuillez nous contacter aux adresses e-mails suivantes:
 
-setayesh.ghamat@epitech.eu,
-massoud.shams@epitech.eu,
-sebastien.oge@epitech.eu,
+setayesh.ghamat@epitech.eu, 
+massoud.shams@epitech.eu, 
+sebastien.oge@epitech.eu, 
 
 
 
