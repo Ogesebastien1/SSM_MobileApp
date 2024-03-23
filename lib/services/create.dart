@@ -1,6 +1,5 @@
 import "package:http/http.dart" as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:ssm_oversight/items/board.dart';
 
 // Ensure dotenv is loaded before calling these variables.
 Future<void> initEnv() async {
