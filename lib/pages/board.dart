@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ssm_oversight/items/card.dart'; 
 import 'package:ssm_oversight/items/list.dart';
+import 'package:ssm_oversight/items/member.dart';
 import '../services/read.dart';
 import '../services/update.dart';
 import '../services/create.dart';
@@ -23,8 +24,11 @@ class _BoardPageState extends State<BoardPage> {
   final TextEditingController _editListNameController = TextEditingController();
   final TextEditingController _editCardTitleController = TextEditingController();
   final TextEditingController _editCardDescriptionController = TextEditingController();
+  List<MemberItem> _boardMembers = [];
   List<ListItem> _lists = [];
   List<CardItem> _cards = [];
+  // ignore: prefer_typing_uninitialized_variables
+  var memberShowFullName;
 
   @override
   void initState() {
@@ -34,6 +38,11 @@ class _BoardPageState extends State<BoardPage> {
 
   void fetchData() async {
     try {
+      List<dynamic> memberMaps = await getBoardMembers(widget.boardId);
+      List<MemberItem> memberItems = memberMaps.map((memberMap){
+        return MemberItem.fromMap(memberMap as Map<String, dynamic>);
+      }).toList();
+
       List<dynamic> listMaps = await getBoardLists(widget.boardId);
       List<ListItem> listItems = listMaps.map((listMap) {
         return ListItem.fromMap(listMap as Map<String, dynamic>);
@@ -45,8 +54,10 @@ class _BoardPageState extends State<BoardPage> {
       }).toList();
 
       setState(() {
+        _boardMembers = memberItems;
         _cards = cardItems;
         _lists = listItems;
+        memberShowFullName = false;
       });
     } catch (error) {
       print('An error occurred: $error');
@@ -72,8 +83,6 @@ class _BoardPageState extends State<BoardPage> {
         title: Text(widget.name),
         centerTitle: true,
       ),
-
-
       body: Column(
         children: [
           Padding(
@@ -446,18 +455,95 @@ void _showDeleteCardDialog(int cardIndex) {
   // Function to show dialog for card details
   void _showCardDetailsDialog(int cardIndex) {
     CardItem card = _cards[cardIndex];
+    var cardMembers = _cards[cardIndex].memberIds;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(card.name),
-          content: const SingleChildScrollView(
-            child: ListBody(
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: <Widget>[
+                      for (var i = 0; i < cardMembers.length; i++)
+                        for (var boardMember in _boardMembers)
+                          if (cardMembers[i] == boardMember.id)
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  memberShowFullName = !memberShowFullName;
+                                });
+                              },
+                              child: CircleAvatar(
+                                backgroundColor: Colors.blue,
+                                child: Text(
+                                  memberShowFullName ? boardMember.fullName : boardMember.initials,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Assign/Unassign'),
+                                content: Container(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Column(
+                                        children: <Widget>[
+                                          const Text('Assigned members', style: TextStyle(fontWeight: FontWeight.bold)),
+                                          for (var i = 0; i < cardMembers.length; i++)
+                                            for (var boardMember in _boardMembers)
+                                              if (cardMembers[i] == boardMember.id)
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      cardMembers.remove(boardMember.id); // Remove the member id from the list
+                                                      updateCardMembers(_cards[cardIndex].id, cardMembers); // Update the card members
+                                                    });
+                                                  },
+                                                  child: Text(boardMember.fullName),
+                                                ),
+                                        ],
+                                      ),
+                                      const Divider(), // Line in the middle
+                                      Column(
+                                        children: <Widget>[
+                                          const Text('Unassigned members', style: TextStyle(fontWeight: FontWeight.bold)),
+                                          for (var boardMember in _boardMembers)
+                                            if (!cardMembers.contains(boardMember.id))
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    cardMembers.add(boardMember.id); // Remove the member id from the list
+                                                    updateCardMembers(_cards[cardIndex].id, cardMembers); // Update the card members
+                                                  });
+                                                },
+                                                child: Text(boardMember.fullName),
+                                              ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
                 Text('card.description'),
               ],
             ),
-          ),
           actions: <Widget>[
             TextButton(
               child: const Text('Close'),
