@@ -169,3 +169,30 @@ Future<void> updateCard(String idCard, String nameOrIdList, bool moving) async {
     }
   }
 }
+
+// update card name
+Future<void> updateCardMembers(String idCard, List<dynamic> idMembers) async {
+  if (idCard.isEmpty || idMembers.isEmpty) {
+    throw ArgumentError('ID and name cannot be empty.');
+  }
+
+  try {
+    var url = Uri.https('api.trello.com', '/1/cards/$idCard', {
+      'idMembers': idMembers,
+      'key': apiKey,
+      'token': apiToken,
+    });
+
+    var response = await http.put(url, headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      print('Card updated successfully.');
+    }
+
+  } catch (e) {
+    throw Exception('Failed to update card: $e');
+  }
+}

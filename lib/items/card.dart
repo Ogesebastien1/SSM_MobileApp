@@ -1,18 +1,18 @@
 // card.dart
 class CardItem {
-  final String id;
-  final String idList;
-  final String name;
-  final String description;
+  String id;
+  String name;
+  String idList;
+  List<dynamic> memberIds;
 
-  CardItem({required this.id, required this.idList, required this.name, required this.description});
+  CardItem({required this.id, required this.name, required this.idList, required this.memberIds});
 
   factory CardItem.fromMap(Map<String, dynamic> map) {
     return CardItem(
-      id: map['id'] ?? '',
-      idList: map['idList'] ?? '',
-      name: map['name'] ?? '',
-      description: map['description'] ?? '',
+      id: map['id'], //'id' is the key in the response
+      name: map['name'],
+      idList: map['idList'],
+      memberIds: (map['idMembers'] as List<dynamic>?) ?? [],
     );
   }
 
@@ -21,7 +21,7 @@ class CardItem {
       'id': id,
       'idList': idList,
       'name': name,
-      'description': description,
+      //'description': description,
     };
   }
 }
