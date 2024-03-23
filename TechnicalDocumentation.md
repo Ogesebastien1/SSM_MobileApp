@@ -144,14 +144,14 @@ Pour lancer les tests unitaires il existe deux solutions :
 
 1. ```flutter test```
 
-3. Accédez à l'onglet "Exécuter & Déboguer" dans Visual Studio Code, puis lancez l'option "All tests" située dans la section en haut à droite.
+2. Accédez à l'onglet "Exécuter & Déboguer" dans Visual Studio Code, puis lancez l'option "All tests" située dans la section en haut à droite.
 
 
 ## Déploiement
 Le déploiement de l'application se fait en utilisant les commandes suivantes :
 
 1. Pour générer un APK pour Android : ```flutter build apk```
-1. Pour générer un bundle pour iOS : ```flutter build ios```
+2. Pour générer un bundle pour iOS : ```flutter build ios```
 
 
 ## Documentation Complémentaire
