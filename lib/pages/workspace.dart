@@ -7,19 +7,17 @@ import '../services/delete.dart';
 import '../services/create.dart';
 
 class Workspace extends StatefulWidget {
-
   final String workspaceId;
 
   const Workspace({super.key, required this.workspaceId});
 
   @override
-  WorkspaceState createState() => WorkspaceState();
+  // ignore: library_private_types_in_public_api
+  _WorkspaceState createState() => _WorkspaceState();
 }
 
-class WorkspaceState extends State<Workspace> {
+class _WorkspaceState extends State<Workspace> {
   List<BoardItem> boards = [];
-  bool createFromTemplate = false;
-  
 
   @override
   void initState() {
@@ -30,99 +28,102 @@ class WorkspaceState extends State<Workspace> {
   void fetchData() async {
     try {
       List<dynamic> boardMaps = await getWorkspaceBoards(widget.workspaceId);
-      List<BoardItem> boardItems = boardMaps.map((boardMap) {
-        return BoardItem.fromMap(boardMap as Map<String, dynamic>);
-      }).toList();
+      List<BoardItem> boardItems =
+          boardMaps.map((boardMap) => BoardItem.fromMap(boardMap)).toList();
 
       setState(() {
         boards = boardItems;
       });
     } catch (error) {
+      // ignore: avoid_print
       print('An error occurred: $error');
     }
   }
 
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              'assets/images/j.jpg',
+              fit: BoxFit.cover,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 48.0),
+                SafeArea(
+  child: Container(
+    alignment: Alignment.topCenter,
+    padding: const EdgeInsets.only(top: 16.0), 
+    child: const Text(
+      'My Boards',
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Color.fromARGB(255, 116, 159, 168), // Text color
       ),
-      title: Text('Workspace'),
     ),
-    body: Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.asset(
-          'assets/images/backgroundHomePage.jpeg',
-          fit: BoxFit.cover,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 150, left: 8.0, right: 8.0),
-                child: Align(
+  ),
+),
+                const SizedBox(height: 11.0),
+                Align(
                   alignment: Alignment.center,
-                  child: Text(
-                    'My Boards',
-                    style: TextStyle(fontSize: 30, color: Colors.white),
-                  ),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              Align(
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // The function to show the dialog for creating a new workspace
-                    showCreateBoardDialog();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple, // Button color
-                    foregroundColor: Colors.white, // Text color
-                    shape: StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-                  ),
-                  child: const Text('Create new board'),
-                ),
-              ),
-              const SizedBox(height: 20), // Adjust the space as needed
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: (boards.length / 2).ceil(),
-                            itemBuilder: (BuildContext context, int index) {
-                              return boardButton(index);
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 16.0),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: (boards.length / 2).floor(),
-                            itemBuilder: (BuildContext context, int index) {
-                              return boardButton(index + (boards.length / 2).ceil());
-                            },
-                          ),
-                        ),
-                      ],
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showCreateBoardDialog();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 27, 73, 75).withOpacity(0.9),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Create new board',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: boards.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return boardButton(index);
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-     
-      );
+      ),
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 27, 73, 75).withOpacity(0.9),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          'Workspaces', // Added text "Workspaces"
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
   }
 
   Widget boardButton(int index) {
@@ -134,6 +135,13 @@ Widget build(BuildContext context) {
             context: context,
             builder: (BuildContext context) {
               return Container(
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 94, 150, 142),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(25.0),
+                    topRight: Radius.circular(25.0),
+                  ),
+                ),
                 child: Wrap(
                   children: <Widget>[
                     ListTile(
@@ -152,11 +160,11 @@ Widget build(BuildContext context) {
                         Navigator.pop(context);
                       },
                     ),
-                     ListTile(
+                    ListTile(
                       leading: const Icon(Icons.open_in_browser),
                       title: const Text('Open Board'),
                       onTap: () {
-                        Navigator.pop(context); // Close the bottom sheet
+                        Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -171,17 +179,27 @@ Widget build(BuildContext context) {
             },
           );
         },
-        child: Container(
-          width: double.infinity,
-          height: 70,
-          decoration: BoxDecoration(
-            color: Colors.white,
+        child: Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Center(
-            child: Text(
-              boards[index].name,
-              style: const TextStyle(color: Colors.black),
+          child: Container(
+            height: 70,
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 27, 94, 97).withOpacity(0.9),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: Text(
+                boards[index].name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
             ),
           ),
         ),
@@ -200,74 +218,47 @@ Widget build(BuildContext context) {
 
   void showCreateBoardDialog() async {
   TextEditingController nameController = TextEditingController();
-  String? selectedTemplate = 'Without template'; // Default selection
 
   showDialog<void>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Create New Board'),
-        content: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(hintText: 'Enter Board name'),
-                ),
-                DropdownButton<String>(
-                  value: selectedTemplate,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedTemplate = newValue!;
-                    });
-                  },
-                  items: <String>['Without template', 'Agile', 'Go-to-market strategy', 'Kanban'] // Updated with 'Without template' option
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ],
-            );
-          },
+        backgroundColor: const Color.fromARGB(255, 27, 73, 75),
+        title: const Text(
+          'Create a New Board',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: TextField(
+          controller: nameController,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: 'Enter Board name',
+            hintStyle: TextStyle(color: Colors.white),
+          ),
         ),
         actions: [
           TextButton(
-            child: const Text('Cancel'),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           TextButton(
-            child: const Text('Create'),
+            child: const Text(
+              'Create',
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () async {
               var newName = nameController.text;
               if (newName.isNotEmpty) {
                 try {
-                  if (selectedTemplate != 'Without template') { // Check if template is selected
-                    var templateId; // Define templateId based on selectedTemplate
-                    // Set templateId based on selectedTemplate
-                    if (selectedTemplate == 'Agile') {
-                      templateId = '54c93f6f836da7c4865460d2'; // Agile template ID
-                       print('creating template Agile');
-                    } else if (selectedTemplate == 'Go-to-market strategy') {
-                      templateId = '57e1548d041d8599c91361f5'; // Project management
-                    } else if (selectedTemplate == 'Kanban') {
-                      templateId = '5e20e06c460b391727ce7a2b'; // Kanban template ID
-                    }
-                    print('creating template');
-                    // Create board from the selected template
-                    await createBoardFromTemplate(templateId, widget.workspaceId, newName);
-                  } else {
-                    // If 'Without template' selected, create a board without a template
-                    await addBoard(newName, widget.workspaceId);
-                  }
-                  Navigator.pop(context); // Close the dialog
-                  fetchData(); // Refresh the list of workspaces
+                  await addBoard(newName, widget.workspaceId);
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                  fetchData();
                 } catch (e) {
                   showErrorDialog('Failed to create the Board: $e');
                 }
@@ -284,54 +275,63 @@ Widget build(BuildContext context) {
 
 
   Future<void> showEditBoard(String boardId, String currentName) async {
-      TextEditingController nameController = TextEditingController(text: currentName);
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false, // User must tap button!
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Edit Board'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(hintText: "Enter new name"),
-                  )
-                ],
-              ),
+    TextEditingController nameController = TextEditingController(text: currentName);
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color.fromARGB(255, 8, 43, 45),
+          title: const Text(
+            'Edit Board',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  controller: nameController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(hintText: "Enter new name"),
+                )
+              ],
             ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Cancel'),
-                onPressed: () {
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Update',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                try {
+                  await updateBoard(boardId, nameController.text);
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: const Text('Update'),
-                onPressed: () async {
-                  try {
-                    await updateBoard(boardId, nameController.text);
-                      // ignore: use_build_context_synchronously
-                      Navigator.of(context).pop(); // Close the dialog
-                      fetchData();
-                  } catch (e) {
-                    if (e.toString().contains("Board short name is taken")) {
-                      // Handle the specific error, e.g., show an error message to the user
-                      showErrorDialog("The Board name is already taken. Please choose a different name.");
-                    } else {
-                      // Handle other errors
-                      showErrorDialog("An error occurred while updating the Board.");
-                    }
+                  fetchData();
+                } catch (e) {
+                  if (e.toString().contains("Board short name is taken")) {
+                    showErrorDialog("The Board name is already taken. Please choose a different name.");
+                  } else {
+                    showErrorDialog("An error occurred while updating the Board.");
                   }
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void showErrorDialog(String errorMessage) {
     showDialog(
@@ -353,3 +353,4 @@ Widget build(BuildContext context) {
     );
   }
 }
+

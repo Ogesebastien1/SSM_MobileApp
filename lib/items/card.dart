@@ -1,3 +1,4 @@
+// card.dart
 class CardItem {
   String id;
   String name;
@@ -13,5 +14,14 @@ class CardItem {
       idList: map['idList'],
       memberIds: (map['idMembers'] as List<dynamic>?) ?? [],
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'idList': idList,
+      'name': name,
+      //'description': description,
+    };
   }
 }

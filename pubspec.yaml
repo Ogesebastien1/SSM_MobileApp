@@ -41,6 +41,10 @@ flutter:
   assets:
     - assets/images/backgroundHomePage.jpeg
     - assets/images/EPITECH.jpeg
+    - assets/images/pawel-czerwinski-g0eRErPBoTA-unsplash.jpg
+    - assets/images/j.jpg
+
+
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

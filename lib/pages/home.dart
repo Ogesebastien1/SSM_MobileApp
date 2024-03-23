@@ -42,185 +42,214 @@ Widget build(BuildContext context) {
     body: Stack(
       fit: StackFit.expand,
       children: [
+        // Image de fond
         Image.asset(
-          'assets/images/backgroundHomePage.jpeg',
+          'assets/images/j.jpg',
           fit: BoxFit.cover,
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 150, left: 8.0, right: 8.0),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'My Workspaces',
-                    style: TextStyle(fontSize: 30, color: Colors.white),
-                  ),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              Align(
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // The function to show the dialog for creating a new workspace
-                    showCreateWorkspaceDialog();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple, // Button color
-                    foregroundColor: Colors.white, // Text color
-                    shape: StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-                  ),
-                  child: const Text('Create new workspace'),
-                ),
-              ),
-              const SizedBox(height: 20), // Adjust the space as needed
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: (workspaces.length / 2).ceil(),
-                          itemBuilder: (BuildContext context, int index) {
-                            return workspaceButton(index);
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: (workspaces.length / 2).floor(),
-                          itemBuilder: (BuildContext context, int index) {
-                            return workspaceButton(index + (workspaces.length / 2).ceil());
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        // Colonne pour le contenu
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Espace pour créer un espace en haut de l'écran
+            const SizedBox(height: 48.0),
+            // Alignement pour centrer la carte horizontalement
+SafeArea(
+  child: Container(
+    alignment: Alignment.topCenter,
+    padding: const EdgeInsets.only(top: 16.0), 
+    child: const Text(
+      'My Workspaces',
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Color.fromARGB(255, 116, 159, 168), // Text color
       ),
-    );
-  }
+    ),
+  ),
+),
 
-
-  Widget workspaceButton(int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: GestureDetector(
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (BuildContext context) {
-              return Container(
-                child: Wrap(
-                  children: <Widget>[
-                    ListTile(
-                      leading: const Icon(Icons.edit),
-                      title: const Text('Edit Workspace'),
-                      onTap: () {
-                        Navigator.pop(context); // Close the bottom sheet first
-                        var workspaceId = workspaces[index].id; // Assuming WorkspaceItem has an 'id' property
-                        showEditDialog(workspaceId, workspaces[index].displayName);
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.delete),
-                      title: const Text('Delete Workspace'),
-                      onTap: () {
-                        deleteWorkspaceItem(workspaces[index].id);
-                        Navigator.pop(context);
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.open_in_browser),
-                      title: const Text('Open Workspace'),
-                      onTap: () {
-                        Navigator.pop(context); 
-                        Navigator.pushNamed(context, '/workspace', arguments: {'workspaceId': workspaces[index].id},);
-                      },
-                    ),
-                  ],
+            const SizedBox(height: 11.0),
+            Align(
+              alignment: Alignment.center,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Fonction pour afficher la boîte de dialogue de création d'un nouvel espace de travail
+                  showCreateWorkspaceDialog();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 27, 73, 75).withOpacity(0.9),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              );
-            },
-          );
-        },
+                child: const Text(
+                  'Create a new workspace',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ListView.builder(
+                itemCount: workspaces.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return workspaceButton(index);
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+  Widget workspaceButton(int index) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+    child: GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              decoration: const BoxDecoration(
+        color: Color.fromARGB(255, 94, 150, 142), 
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25.0),
+          topRight: Radius.circular(25.0),
+        ),
+ ),
+
+              child: Wrap(
+                children: <Widget>[
+                  ListTile(
+                    leading: const Icon(Icons.edit),
+                    title: const Text('Edit Workspace'),
+                    onTap: () {
+                      Navigator.pop(context); // Close the bottom sheet first
+                      var workspaceId = workspaces[index].id;
+                      showEditDialog(workspaceId, workspaces[index].displayName);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.delete),
+                    title: const Text('Delete Workspace'),
+                    onTap: () {
+                      deleteWorkspaceItem(workspaces[index].id);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.open_in_browser),
+                    title: const Text('Open Workspace'),
+                    onTap: () {
+                      Navigator.pop(context); 
+                      Navigator.pushNamed(context, '/workspace', arguments: {'workspaceId': workspaces[index].id},);
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Container(
-          width: double.infinity,
           height: 70,
+          padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color.fromARGB(255, 27, 94, 97).withOpacity(0.9),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
             child: Text(
               workspaces[index].displayName,
-              style: const TextStyle(color: Colors.black),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Future<void> showEditDialog(String workspaceId, String currentName) async {
-    TextEditingController nameController = TextEditingController(text: currentName);
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Edit Workspace'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(hintText: "Enter new name"),
-                )
-              ],
-            ),
+  TextEditingController nameController = TextEditingController(text: currentName);
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // User must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: const Color.fromARGB(255, 8, 43, 45), // Set background color
+        title: const Text(
+          'Edit Workspace',
+          style: TextStyle(color: Colors.white), // Text color
+        ),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              TextField(
+                controller: nameController,
+                style: const TextStyle(color: Colors.white), // Text color
+                decoration: const InputDecoration(
+                  hintText: "Enter new name",
+                  hintStyle: TextStyle(color: Colors.white70), // Hint text color
+                ),
+              )
+            ],
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white), // Button text color
             ),
-            TextButton(
-              child: const Text('Update'),
-              onPressed: () async {
-                try {
-                  await updateWorkspaceName(workspaceId, nameController.text);
-                    // ignore: use_build_context_synchronously
-                    Navigator.of(context).pop(); // Close the dialog
-                    fetchData(); // Refresh workspace list
-                } catch (e) {
-                  if (e.toString().contains("Organization short name is taken")) {
-                    // Handle the specific error, e.g., show an error message to the user
-                    showErrorDialog("The workspace name is already taken. Please choose a different name.");
-                  } else {
-                    // Handle other errors
-                    showErrorDialog("An error occurred while updating the workspace.");
-                  }
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: const Text(
+              'Update',
+              style: TextStyle(color: Colors.white), // Button text color
+            ),
+            onPressed: () async {
+              try {
+                await updateWorkspaceName(workspaceId, nameController.text);
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop(); // Close the dialog
+                fetchData(); // Refresh workspace list
+              } catch (e) {
+                if (e.toString().contains("Organization short name is taken")) {
+                  // Handle the specific error, e.g., show an error message to the user
+                  showErrorDialog("The workspace name is already taken. Please choose a different name.");
+                } else {
+                  // Handle other errors
+                  showErrorDialog("An error occurred while updating the workspace.");
                 }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
   void showErrorDialog(String errorMessage) {
     showDialog(
       context: context,
@@ -244,51 +273,64 @@ Widget build(BuildContext context) {
   void deleteWorkspaceItem(String workspaceId) async {
     try {
       await deleteWorkspace(workspaceId);
-      fetchData(); // Refresh the list of workspaces after deletion
+      fetchData(); 
     } catch (e) {
       showErrorDialog("Failed to delete workspace: $e");
     }
   }
 
   void showCreateWorkspaceDialog() async {
-    TextEditingController nameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
 
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Create New Workspace'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(hintText: 'Enter workspace name'),
+  showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: const Color.fromARGB(255, 27, 73, 75), // Set background color
+        title: const Text(
+          'Create a New Workspace',
+          style: TextStyle(color: Colors.white), // Text color
+        ),
+        content: TextField(
+          controller: nameController,
+          style: const TextStyle(color: Colors.white), // Text color
+          decoration: const InputDecoration(
+            hintText: 'Enter your workspace name',
+            hintStyle: TextStyle(color: Colors.white), // Hint text color
           ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+        ),
+        actions: [
+          TextButton(
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white), // Button text color
             ),
-            TextButton(
-              child: const Text('Create'),
-              onPressed: () async {
-                final String newName = nameController.text;
-                if (newName.isNotEmpty) {
-                  try {
-                    await addWorkspace(newName);
-                    Navigator.pop(context); // Close the dialog
-                    fetchData(); // Refresh the list of workspaces
-                  } catch (e) {
-                    showErrorDialog('Failed to create the workspace: $e');
-                  }
-                } else {
-                  showErrorDialog('Name cannot be empty.');
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            child: const Text(
+              'Create',
+              style: TextStyle(color: Colors.white), // Button text color
+            ),
+            onPressed: () async {
+              final String newName = nameController.text;
+              if (newName.isNotEmpty) {
+                try {
+                  await addWorkspace(newName);
+                  Navigator.pop(context); // Close the dialog
+                  fetchData(); // Refresh the list of workspaces
+                } catch (e) {
+                  showErrorDialog('Failed to create the workspace: $e');
                 }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
+              } else {
+                showErrorDialog('Name cannot be empty.');
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}}
